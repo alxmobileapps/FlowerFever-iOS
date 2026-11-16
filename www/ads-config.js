@@ -40,4 +40,4 @@ window.FLOWER_ADS_IOS = {
 window.FLOWER_IOS_SKU_PREFIX = 'com.alxmobileapps.flowerfever.';
 /* App Store app id (the number in the App Store link, App Store Connect → App Information → Apple ID).
    Used in "share" messages. Leave empty until the app exists. */
-window.FLOWER_APPSTORE_ID = '';
+window.FLOWER_APPSTORE_ID = '6835387214';
