@@ -12,6 +12,9 @@ The ATT request appears automatically about 1 second after launch, before the Go
 GUIDELINE 3.1.1 - RESTORING PURCHASES
 "Restore purchases" is in the Diamond shop (under the packs) and in Settings. Diamonds (consumable) are saved with the game; with the optional account (Settings > Your account > Sign in with Apple / Google) they are kept on all the user's devices. "No Ads + 100 Diamonds" (non-consumable) is restored with Restore purchases.
 
+GUIDELINE 1.2 - USER-GENERATED CONTENT (friends)
+Players only see each other's nickname and garden after sharing a Player ID. Nicknames are filtered for offensive words (English and Filipino). In Friends, the ✕ next to a player opens "Block & report": the player is removed, their gifts are ignored, their garden can't be opened, and a report is sent to us (reviewed within 24 hours). Contact: alx.mobileapps@gmail.com (shown in the Friends window).
+
 ACCOUNT
 No login is required to play. Optional account: Settings > Your account > Sign in with Apple or Sign in with Google. Account deletion: Settings > Your account > "Delete my account and cloud save" (also revokes Sign in with Apple).
 
