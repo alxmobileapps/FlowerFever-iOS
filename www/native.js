@@ -19,18 +19,12 @@
     const test = !!cfg.testing;
     let ready = (async () => {
       try {
+        await window.FlowerFeverATT;   // the tracking question is answered before the ad SDK starts
         await AdMob.initialize({ initializeForTesting: test });
         try {
           const info = await AdMob.requestConsentInfo();
           if (info && info.isConsentFormAvailable && info.status === 'REQUIRED') await AdMob.showConsentForm();
         } catch (e) { log('consent', e); }
-        if (IOS) {   // Apple's "Allow tracking?" question (App Tracking Transparency), asked once, before the first ad
-          try {
-            await new Promise(r => setTimeout(r, 1200));   // iOS only shows it once the app is fully on screen
-            const t = await AdMob.trackingAuthorizationStatus();
-            if (t && t.status === 'notDetermined') await AdMob.requestTrackingAuthorization();
-          } catch (e) { log('tracking', e); }
-        }
       } catch (e) { log('admob init', e); }
     })();
 
@@ -204,6 +198,19 @@
     };
   }, false);
 
+  /* ---------- Apple's "Allow tracking?" question (App Tracking Transparency) ----------
+     Asked about 1 s after launch, BEFORE the ad SDK starts and before any other permission question
+     (App Review 2.1). Everything else that needs it waits for window.FlowerFeverATT. */
+  window.FlowerFeverATT = (async () => {
+    if (!IOS) return;
+    const Ad = P('AdMob'); if (!Ad) return;
+    try {
+      await new Promise(r => setTimeout(r, 1000));
+      const t = await Ad.trackingAuthorizationStatus();
+      if (t && t.status === 'notDetermined') await Ad.requestTrackingAuthorization();
+    } catch (e) { log('tracking', e); }
+  })();
+
   /* ---------- Local notifications ---------- */
   const LN = P('LocalNotifications');
   if (LN) {
@@ -211,7 +218,7 @@
     window.FlowerFeverNotify = {
       async schedule(list) {
         try {
-          if (!asked) { asked = true; const p = await LN.checkPermissions(); if (p.display !== 'granted') await LN.requestPermissions(); }
+          if (!asked) { asked = true; await window.FlowerFeverATT; const p = await LN.checkPermissions(); if (p.display !== 'granted') await LN.requestPermissions(); }
           await LN.cancel({ notifications: list.map(n => ({ id: n.id })) }).catch(() => {});
           await LN.schedule({ notifications: list.map(n => ({ id: n.id, title: n.title, body: n.body, schedule: { at: new Date(n.at) } })) });
         } catch (e) { log('notify', e); }

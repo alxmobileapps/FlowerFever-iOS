@@ -71,6 +71,21 @@ rep("""@keyframes pr-write{to{clip-path:inset(-60% -30% -60% -30%)}}""",
 #praise .pw{padding:1em 1.45em;margin:-1em -1em;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0)}
 @keyframes pr-write{from{clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0);-webkit-clip-path:inset(0 0 0 0)}}""")
 
+# --- Restore Purchases also inside the Diamond shop (App Review 3.1.1), not only in Settings ---
+rep("""<div class="btns"><button class="btn alt" id="gBack">${short ? "Not now" : "Back"}</button></div>`, el => {""",
+    """<div class="btns"><button class="btn alt" id="gRestore">Restore purchases</button><button class="btn alt" id="gBack">${short ? "Not now" : "Back"}</button></div>`, el => {""")
+rep("""    el.querySelector("#gBack").onclick = () => back((save.gems || 0) >= need);""",
+    """    el.querySelector("#gBack").onclick = () => back((save.gems || 0) >= need);
+    el.querySelector("#gRestore").onclick = async () => {
+      const st = window.FlowerFeverStore; let ids = null;
+      if (st && typeof st.restore === "function") { try { ids = await st.restore(); } catch (e) { ids = null; } }
+      let msg;
+      if (!ids) msg = "Restoring works in the Flower Fever app.";
+      else { const had = !!save.noAds; if (ids.includes("noads100")) save.noAds = true; if (ids.includes("starter30")) save.starterBought = true; persist(); msg = save.noAds && !had ? "No ads restored. Thank you!" : ids.length ? "Your purchases are up to date." : "No purchases found for this Apple ID."; }
+      track("restore", { found: ids ? ids.length : -1, from: "shop" });
+      show(`<div class="ribbon">Restore purchases</div><h2>${msg}</h2><p>Diamonds you bought are saved with your game: sign in (Settings → Your account) to keep them on all your devices.</p><div class="btns"><button class="btn" id="rOk">OK</button></div>`, e2 => { e2.querySelector("#rOk").onclick = () => showGems(back, need); });
+    };""")
+
 if "Google Play" in src.replace("Google Play purchase", ""):
     import re
     left = [m.start() for m in re.finditer("Google Play", src)]
