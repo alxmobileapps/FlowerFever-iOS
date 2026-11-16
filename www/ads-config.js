@@ -26,15 +26,15 @@ window.FLOWER_PRODUCTS = {
 
 /* ===== iPhone (iOS) =====
  * Create an iOS app in AdMob (Apps → Add app → iOS) and 3 ad units (Banner, Interstitial, Rewarded),
- * then put their ids here. Until then these are Google's official iOS TEST ids (safe, never paid).
+ * Real Flower Fever iOS AdMob ids (account ca-app-pub-2452250229562082).
  * appId is copied into the iPhone app's Info.plist by the build (GADApplicationIdentifier).
  */
 window.FLOWER_ADS_IOS = {
-  appId: 'ca-app-pub-3940256099942544~1458002511',
-  bannerId: 'ca-app-pub-3940256099942544/2934735716',
-  interstitialId: 'ca-app-pub-3940256099942544/4411468910',
-  rewardedId: 'ca-app-pub-3940256099942544/1712485313',
-  testing: true
+  appId: 'ca-app-pub-2452250229562082~9957554443',
+  bannerId: 'ca-app-pub-2452250229562082/5826737743',
+  interstitialId: 'ca-app-pub-2452250229562082/3200574400',
+  rewardedId: 'ca-app-pub-2452250229562082/1887492733',
+  testing: false
 };
 /* App Store in-app purchase ids = this prefix + the ids above, e.g. com.alxmobileapps.flowerfever.gems10 */
 window.FLOWER_IOS_SKU_PREFIX = 'com.alxmobileapps.flowerfever.';
