@@ -346,7 +346,17 @@
   if (H) {
     // phones barely feel pulses under ~20 ms, so short ones are lengthened a little
     const buzz = d => { try { H.vibrate({ duration: Math.max(20, d) }); } catch (e) {} };
+    // iPhone: the Taptic Engine "impact" taps fire instantly, in step with the effects
+    // (vibrate() on iOS starts a slow, long system buzz that lags behind)
+    const tap = style => { try { H.impact({ style }); } catch (e) {} };
+    const IOS_TAPS = { tap: ['LIGHT'], pop: ['LIGHT'], swap: ['MEDIUM'], beam: ['MEDIUM'], boom: ['HEAVY'], big: ['HEAVY', 'HEAVY'], bad: null };
     window.FlowerFeverHaptics = (kind, ms) => {
+      if (IOS) {
+        if (kind === 'bad') { try { H.notification({ type: 'ERROR' }); } catch (e) {} return; }
+        const seq = IOS_TAPS[kind] || ['LIGHT'];
+        seq.forEach((st, i) => i ? setTimeout(() => tap(st), 90 * i) : tap(st));
+        return;
+      }
       if (Array.isArray(ms)) { let t = 0; ms.forEach((d, i) => { if (i % 2 === 0) setTimeout(() => buzz(d), t); t += d; }); }
       else buzz(ms || 15);
     };

@@ -63,6 +63,14 @@ rep("""<button class="btn" id="ratePlay">Rate in Play Store</button>""", """<but
 rep("""const PLAY_URL = "https://play.google.com/store/apps/details?id=com.alxmobileapps.flowerfever";""",
     """const PLAY_URL = window.FLOWER_APPSTORE_ID ? "https://apps.apple.com/app/id" + window.FLOWER_APPSTORE_ID : "";""")
 
+# --- praise text ("Amazing!"): iPhone Safari clips the neon glow and the write-on effect to the text box
+# (it ignores the negative clip-path insets), which shows as a pink rectangle and cut-off letters.
+# Make the box itself big enough for the glow (padding, cancelled by a negative margin) and clip inside it.
+rep("""@keyframes pr-write{to{clip-path:inset(-60% -30% -60% -30%)}}""",
+    """@keyframes pr-write{to{clip-path:inset(-60% -30% -60% -30%)}}
+#praise .pw{padding:1em 1.45em;margin:-1em -1em;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0)}
+@keyframes pr-write{from{clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0);-webkit-clip-path:inset(0 0 0 0)}}""")
+
 if "Google Play" in src.replace("Google Play purchase", ""):
     import re
     left = [m.start() for m in re.finditer("Google Play", src)]
