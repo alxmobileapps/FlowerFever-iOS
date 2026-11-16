@@ -1,0 +1,105 @@
+name: App Store listing + submit
+
+# Linux runner (cheap). Fills in the App Store listing from appstore/ and, when asked, submits for review.
+#   1. appstore/asc.py prepare      version, content rights, age rating, price Free, availability, in-app purchases
+#   2. fastlane deliver             text (appstore/metadata) + screenshots (appstore/screenshots) + App Review info
+#   3. appstore/asc.py attach-build newest processed build >= MIN_BUILD -> version
+#   4. appstore/asc.py submit       only when "submit" is chosen (Run workflow) or the commit message has [submit]
+# Report: the listing-results branch.
+on:
+  workflow_dispatch:
+    inputs:
+      submit:
+        description: 'Submit for App Review after filling in the listing'
+        type: boolean
+        default: false
+      min_build:
+        description: 'Only attach a build at least this new'
+        default: '10'
+  push:
+    branches: [listing]
+
+permissions:
+  contents: write
+
+jobs:
+  listing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.0' }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      MIN_BUILD: ${{ inputs.min_build || '10' }}
+      DO_SUBMIT: ${{ inputs.submit == true || contains(github.event.head_commit.message, '[submit]') }}
+      REPORT: ${{ github.workspace }}/listing-out/report.txt
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: API key file
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          mkdir -p listing-out
+          if [ -n "$ASC_KEY_P8" ]; then RAW="$ASC_KEY_P8"; else RAW="$(echo "$ASC_KEY_P8_BASE64" | base64 --decode)"; fi
+          BODY="$(printf '%s' "$RAW" | sed -e 's/-----BEGIN PRIVATE KEY-----//' -e 's/-----END PRIVATE KEY-----//' | tr -d ' \t\r\n')"
+          KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+          { echo "-----BEGIN PRIVATE KEY-----"; printf '%s\n' "$(printf '%s' "$BODY" | fold -w 64)"; echo "-----END PRIVATE KEY-----"; } > "$KEY_PATH"
+          echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+          python3 - "$KEY_PATH" > "$RUNNER_TEMP/api_key.json" <<'PY'
+          import json, os, sys
+          print(json.dumps({"key_id": os.environ["ASC_KEY_ID"], "issuer_id": os.environ["ASC_ISSUER_ID"],
+                            "key": open(sys.argv[1]).read(), "in_house": False}))
+          PY
+          pip install --quiet pyjwt cryptography requests
+
+      - name: Prepare app (version, age rating, price, availability, in-app purchases)
+        run: python3 appstore/asc.py prepare
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Upload text + screenshots + App Review info (fastlane deliver, no submission)
+        run: |
+          echo "== fastlane deliver" >> "$REPORT"
+          set +e
+          gem install fastlane --no-document > listing-out/gem-install.log 2>&1 || { echo "FAIL  gem install fastlane" >> "$REPORT"; exit 1; }
+          fastlane deliver \
+            --api_key_path "$RUNNER_TEMP/api_key.json" \
+            --app_identifier com.alxmobileapps.flowerfever \
+            --app_version "$IOS_APP_VERSION" \
+            --platform ios \
+            --metadata_path appstore/metadata \
+            --screenshots_path appstore/screenshots \
+            --skip_binary_upload true \
+            --overwrite_screenshots true \
+            --submit_for_review false \
+            --automatic_release true \
+            --run_precheck_before_submit false \
+            --force true 2>&1 | tee listing-out/deliver.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" = 0 ]; then echo "OK    fastlane deliver" >> "$REPORT"; else
+            echo "FAIL  fastlane deliver (exit $code)" >> "$REPORT"; grep -iE "error|❌|\[!\]" listing-out/deliver.log | tail -n 25 >> "$REPORT"; exit 1; fi
+
+      - name: Attach newest processed build
+        timeout-minutes: 35
+        run: python3 appstore/asc.py attach-build
+
+      - name: Submit for App Review
+        if: env.DO_SUBMIT == 'true'
+        run: python3 appstore/asc.py submit
+
+      - name: Push report to listing-results branch
+        if: always()
+        run: |
+          OUT="$RUNNER_TEMP/listing-publish"
+          rm -rf "$OUT" && cp -R listing-out "$OUT" && cp "$REPORT" "$OUT/" 2>/dev/null || true
+          echo "run ${{ github.run_number }} for ${{ github.sha }}" > "$OUT/RUN.txt"
+          cd "$OUT"
+          git init -q -b listing-results
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Listing results"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" listing-results

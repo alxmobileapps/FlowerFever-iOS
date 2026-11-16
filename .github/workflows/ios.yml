@@ -26,6 +26,8 @@ on:
       - 'scripts/ios/iap_setup.py'
       - '.github/workflows/iap-setup.yml'
       - 'resources/iap-review.png'
+      - 'appstore/**'
+      - '.github/workflows/appstore.yml'
   workflow_dispatch: {}
 
 jobs:
