@@ -133,6 +133,8 @@ unless s.include?("CapacitorFirebaseAuthentication/Google")
 end
 puts File.read(podfile)
 RUBY
+  # resolve all pods again with the new ones (the first lock pinned GTMSessionFetcher 4.x, Google sign-in needs 3.x)
+  rm -rf ios/App/Podfile.lock ios/App/Pods
 else
   echo "::notice::No GoogleService-Info.plist yet: the iPhone app builds without sign-in, cloud save, friends and analytics."
 fi
