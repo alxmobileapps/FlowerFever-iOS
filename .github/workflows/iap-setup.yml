@@ -1,0 +1,31 @@
+name: App Store in-app purchases setup
+
+# Run by hand (Actions -> this workflow -> Run workflow). Uses a cheap Linux runner, not a Mac.
+# Sets price, countries, name/description and review screenshot of the 7 in-app purchases.
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ios/iap_setup.py'
+      - '.github/workflows/iap-setup.yml'
+
+jobs:
+  iap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fill in the in-app purchases
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          KEY_PATH="$RUNNER_TEMP/AuthKey.p8"
+          if [ -n "$ASC_KEY_P8" ]; then RAW="$ASC_KEY_P8"; else RAW="$(echo "$ASC_KEY_P8_BASE64" | base64 --decode)"; fi
+          BODY="$(printf '%s' "$RAW" | sed -e 's/-----BEGIN PRIVATE KEY-----//' -e 's/-----END PRIVATE KEY-----//' | tr -d ' \t\r\n')"
+          { echo "-----BEGIN PRIVATE KEY-----"; printf '%s\n' "$(printf '%s' "$BODY" | fold -w 64)"; echo "-----END PRIVATE KEY-----"; } > "$KEY_PATH"
+          pip3 install --quiet pyjwt cryptography requests
+          ASC_KEY_PATH="$KEY_PATH" python3 scripts/ios/iap_setup.py
