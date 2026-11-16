@@ -155,3 +155,8 @@ proj.save
 RUBY
 
 echo "Info.plist:"; $PB -c "Print" "$PLIST" | grep -E "GADApplicationIdentifier|NSUserTracking|CFBundleShortVersion|CFBundleVersion|NSPhotoLibraryAdd" || true
+
+# Apple: from April 2027 apps must target iOS 15.0 or later (ITMS-90068). Every iPhone that ran iOS 14 can run iOS 15.
+sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 1[34]\.0;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/App/App.xcodeproj/project.pbxproj
+sed -i '' "s/platform :ios, '1[34]\.0'/platform :ios, '15.0'/" ios/App/Podfile
+grep -m1 "IPHONEOS_DEPLOYMENT_TARGET" ios/App/App.xcodeproj/project.pbxproj; grep -m1 "platform :ios" ios/App/Podfile
