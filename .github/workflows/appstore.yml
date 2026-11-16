@@ -15,7 +15,7 @@ on:
         default: false
       min_build:
         description: 'Only attach a build at least this new'
-        default: '10'
+        default: '11'
   push:
     branches: [listing]
 
@@ -30,7 +30,7 @@ jobs:
       IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.0' }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      MIN_BUILD: ${{ inputs.min_build || '10' }}
+      MIN_BUILD: ${{ inputs.min_build || '11' }}
       DO_SUBMIT: ${{ inputs.submit == true || contains(github.event.head_commit.message, '[submit]') }}
       REPORT: ${{ github.workspace }}/listing-out/report.txt
     steps:
