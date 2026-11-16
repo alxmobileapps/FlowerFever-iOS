@@ -27,6 +27,7 @@ on:
       - '.github/workflows/iap-setup.yml'
       - 'resources/iap-review.png'
       - 'appstore/**'
+      - 'fastlane/**'
       - '.github/workflows/appstore.yml'
   workflow_dispatch: {}
 

@@ -1,0 +1,2 @@
+# fastlane deliver settings come from .github/workflows/appstore.yml (command-line options).
+# This file only tells fastlane that deliver is already set up.
