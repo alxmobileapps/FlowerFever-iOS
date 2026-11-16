@@ -1,0 +1,615 @@
+--- a/www/index.html
++++ b/www/index.html
+@@ -749,0 +750 @@
++.gempacks.single-offer{grid-template-columns:minmax(0,160px)!important;justify-content:center}
+@@ -778,0 +780,8 @@
++.h3track{position:relative;height:100%}
++.h3edge{position:absolute;top:0;height:100%;overflow:hidden;pointer-events:none}
++.h3edge[hidden]{display:none}
++.h3edge img{position:absolute;top:0;height:100%;max-width:none;display:block;object-fit:fill;transform:scaleX(-1)}
++.h3edge.start{left:0}
++.h3edge.start img{right:0}
++.h3edge.end{right:0}
++.h3edge.end img{left:0}
+@@ -827,0 +837 @@
++.farm .fad:not([hidden]) ~ .fsheet{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+@@ -1218,0 +1229 @@
++const SHOWER_FAST_SPEED = 2;
+@@ -1223 +1234 @@
+-const sleep = ms => showerTurbo ? (gameOff += ms, Promise.resolve()) : new Promise(r => setTimeout(r, fastFwd ? ms / 3 : ms));
++const sleep = ms => showerTurbo ? (gameOff += ms, Promise.resolve()) : new Promise(r => setTimeout(r, fastFwd ? ms / SHOWER_FAST_SPEED : ms));
+@@ -2089,0 +2101,8 @@
++function hasNearbySpecial(r, c) {
++  for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
++    if (!dr && !dc) continue;
++    const neighbor = grid[r + dr]?.[c + dc];
++    if (neighbor && neighbor.type !== "normal") return true;
++  }
++  return false;
++}
+@@ -2101 +2120 @@
+-  return cands.find(ok) || null;
++  return cands.find(cell => ok(cell) && (!inShower || !hasNearbySpecial(cell[0], cell[1]))) || null;
+@@ -2147,19 +2166 @@
+-  // end-of-round cascades: the celebration itself floods the board (petal fountains, fireworks, sparkles)
+-  if (inShower) {
+-    const fountains = 2 + Math.floor(nn / 3);
+-    for (let f = 0; f < fountains; f++) setTimeout(() => {
+-      const fx0 = b.left + b.width * (.1 + Math.random() * .8), fy0 = b.top + b.height * (.35 + Math.random() * .6);
+-      for (let i = 0; i < Math.ceil(Math.ceil(12 * qf()) / 2) && drift.length < 100 * qf(); i++) {
+-        const a = -Math.PI / 2 + (Math.random() - .5) * 1.5, v = .35 + Math.random() * .4;
+-        drift.push({ x: fx0, y: fy0, vx: Math.cos(a) * v * .55, vy: Math.sin(a) * v, g: .0009, rot: Math.random() * TAU, vr: (Math.random() - .5) * .02,
+-          size: 9 + Math.random() * 9, col: PETAL_COLS[rnd(PETAL_COLS.length)], flower: Math.random() < .18, ci: rnd(6), life: 0, max: 2600, ph: Math.random() * TAU });
+-      }
+-      sparkleAt(Math.floor((fy0 - b.top) / b.height * ROWS), Math.floor((fx0 - b.left) / b.width * COLS), 6);
+-    }, f * 120);
+-    const fw = 1 + Math.floor(nn / 3);
+-    for (let k = 0; k < fw && pops.length < 80; k++) {
+-      const cx = b.left + b.width * (.12 + Math.random() * .76), cy = b.top + b.height * (.1 + Math.random() * .8);
+-      for (let i = 0; i < 6 && pops.length < 80 * qf(); i++) { const a = i / 6 * TAU, v = .22 + Math.random() * .2; pops.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .1, ci: rnd(6), size: 16 + Math.random() * 12, rot: 0, vr: (Math.random() - .5) * .012, life: -k * 160, max: 1300 }); }
+-    }
+-  }
+-  if (n >= 4 && pops.length < 50) for (let k = 0; k < Math.ceil(Math.min(inShower ? 3 : 4, nn - 2) * .75); k++) {
++  if (n >= 4 && pops.length < 100) for (let k = 0; k < Math.ceil(Math.min(4, nn - 2) * .75); k++) {
+@@ -2167 +2168 @@
+-    for (let i = 0; i < 6 && pops.length < 80 * qf(); i++) { const a = i / 6 * TAU, v = .25 + Math.random() * .2; pops.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .12, ci: rnd(6), size: 16 + Math.random() * 12, rot: 0, vr: (Math.random() - .5) * .01, life: -k * 140, max: 1300 }); }
++    for (let i = 0; i < 12 && pops.length < 160 * qf(); i++) { const a = i / 12 * TAU, v = .25 + Math.random() * .2; pops.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .12, ci: rnd(6), size: 16 + Math.random() * 12, rot: 0, vr: (Math.random() - .5) * .01, life: -k * 140, max: 1300 }); }
+@@ -2173,0 +2175 @@
++  if (reduceMotion) return;
+@@ -2175 +2177 @@
+-  for (let i = 0; i < count && drift.length < 210 * qf(); i++) drift.push({ x: Math.random() * innerWidth, y: -20 - Math.random() * 260, vx: (Math.random() - .5) * .05, vy: .07 + Math.random() * .09, rot: Math.random() * TAU, vr: (Math.random() - .5) * .004,
++  for (let i = 0; i < count && drift.length < (inShower ? 120 : 210) * qf(); i++) drift.push({ x: Math.random() * innerWidth, y: -20 - Math.random() * 260, vx: (Math.random() - .5) * .05, vy: .07 + Math.random() * .09, rot: Math.random() * TAU, vr: (Math.random() - .5) * .004,
+@@ -2176,0 +2179,17 @@
++}
++function boardPetals(r, c, count) {
++  if (reduceMotion || showerTurbo) return;
++  const bounds = canvas.getBoundingClientRect();
++  const x = bounds.left + (c + .5) * bounds.width / COLS;
++  const y = bounds.top + (r + .5) * bounds.height / ROWS;
++  const density = Math.max(.55, QF[quality]);
++  const limit = Math.round(140 * density);
++  const amount = Math.min(Math.round(count * density), Math.max(0, limit - drift.length));
++  for (let i = 0; i < amount; i++) {
++    const angle = -Math.PI + Math.random() * Math.PI;
++    const speed = .18 + Math.random() * .28;
++    drift.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - .08,
++      g: .00035, rot: Math.random() * TAU, vr: (Math.random() - .5) * .012,
++      size: 13 + Math.random() * 9, col: PETAL_COLS[rnd(PETAL_COLS.length)],
++      flower: false, life: 0, max: 1800 + Math.random() * 500, ph: Math.random() * TAU });
++  }
+@@ -2247,2 +2266 @@
+-  n = Math.max(2, Math.round(n * .75 * qf()));
+-  if (inShower) n = Math.ceil(n / 2);
++  n = Math.max(2, Math.round(n * qf()));
+@@ -2257,2 +2275,2 @@
+-function fxBeam(dir, idx, color, width = 1, a = 0, b = (dir === "h" ? COLS : ROWS) - 1) { addShock({ line: dir, idx, str: .3, maxR: 3.5 }); fx.push({ k: "beam", dir, idx, color, width, a, b, t0: T(), dur: inShower ? 760 : 880 }); burstLine(dir, idx, color); for (let i = 0; i < 18; i++) { const x = dir === "h" ? Math.random() * COLS : idx + .5, y = dir === "h" ? idx + .5 : Math.random() * ROWS; parts.push({ x, y, vx: (Math.random() - .5) * .004, vy: (Math.random() - .5) * .004, rot: 0, vr: 0, life: 0, max: 400, kind: "spark", col: "#fff", size: .16 }); } }
+-function fxRing(r, c, R, color) { addShock({ r, c, str: .3 + R * .06, maxR: 3.2 + R * 1.5, speed: .01 + R * .002 }); fx.push({ k: "ring", x: c + .5, y: r + .5, R: R + .8, color, t0: T(), dur: 560 }); fx.push({ k: "ring", x: c + .5, y: r + .5, R: R + 1.4, color, t0: T() + 90, dur: 520, thin: true }); burst(r, c, color, 16, 2.2); }
++function fxBeam(dir, idx, color, width = 1, a = 0, b = (dir === "h" ? COLS : ROWS) - 1) { addShock({ line: dir, idx, str: .3, maxR: 3.5 }); fx.push({ k: "beam", dir, idx, color, width, a, b, t0: T(), dur: 880 }); burstLine(dir, idx, color); for (let i = 0; i < 18; i++) { const x = dir === "h" ? Math.random() * COLS : idx + .5, y = dir === "h" ? idx + .5 : Math.random() * ROWS; parts.push({ x, y, vx: (Math.random() - .5) * .004, vy: (Math.random() - .5) * .004, rot: 0, vr: 0, life: 0, max: 400, kind: "spark", col: "#fff", size: .16 }); } }
++function fxRing(r, c, R, color) { addShock({ r, c, str: .3 + R * .06, maxR: 3.2 + R * 1.5, speed: .01 + R * .002 }); fx.push({ k: "ring", x: c + .5, y: r + .5, R: R + .8, color, t0: T(), dur: 560 }); if (!inShower) fx.push({ k: "ring", x: c + .5, y: r + .5, R: R + 1.4, color, t0: T() + 90, dur: 520, thin: true }); burst(r, c, color, 16, 2.2); }
+@@ -2269 +2287 @@
+-  mag = Math.min(1, mag * .72) / Math.hypot(1, .5);
++  mag = Math.min(3, mag * .72) / Math.hypot(1, .5);
+@@ -2335,2 +2353,2 @@
+-function collectColor(color, r, c) {
+-  for (const g of goals) if (g.k === "color" && g.c === color && g.left > 0) { g.left--; flyIcon(g, r, c); return; }
++function collectColor(color, r, c, immediate = false) {
++  for (const g of goals) if (g.k === "color" && g.c === color && g.left > 0) { g.left--; creditGoal(g, r, c, immediate); return; }
+@@ -2342,2 +2360,6 @@
+-function countSpecial(t, r, c) {
+-  for (const g of goals) if (g.k === "special" && g.t === t && g.left > 0) { g.left--; flyIcon(g, r, c); return; }
++function countSpecial(t, r, c, immediate = false) {
++  for (const g of goals) if (g.k === "special" && g.t === t && g.left > 0) { g.left--; creditGoal(g, r, c, immediate); return; }
++}
++function creditGoal(g, r, c, immediate) {
++  if (immediate) { g.shown = g.left; renderGoal(g); }
++  else flyIcon(g, r, c);
+@@ -2529,0 +2552 @@
++  if (p.noAds && save.noAds) return true;
+@@ -2536,0 +2560,49 @@
++const gemPackPrice = pack => window.FlowerFeverStore?.prices?.[pack.id] || pack.price;
++const gemPackCard = p => `<button class="gempack${p.noAds ? " noads" : ""}${p.starter ? " starter" : ""}" data-i="${GEM_PACKS.indexOf(p)}">${p.tag ? `<em>${p.tag}</em>` : ""}<span class="gpic">${GEM_SVG.repeat(p.n >= 150 ? 3 : p.n >= 50 ? 2 : 1)}</span><b>${p.n}</b><small>diamonds</small>${p.noAds ? `<strong>+ No forced ads</strong>` : p.lives ? `<strong>+ ${p.lives} free lifelines</strong>` : ""}<i>${gemPackPrice(p)}</i></button>`;
++const REMOVE_ADS_PACK = GEM_PACKS.find(pack => pack.noAds);
++
++async function purchaseGemPack(pack) {
++  if (pack.noAds && save.noAds) return false;
++  if (!await buyPack(pack)) return false;
++  if (pack.noAds && save.noAds) return true;
++  track("purchase", { id: pack.id, price: pack.price });
++  addGems(pack.n);
++  if (pack.noAds) {
++    save.noAds = true;
++    syncBanner();
++  }
++  if (pack.lives) save.freeLife = freeLives() + pack.lives;
++  if (pack.starter) save.starterBought = true;
++  persist();
++  sfx("win");
++  return true;
++}
++
++function showRemoveAdsOffer(next) {
++  if (!adsAllowed()) { next(); return; }
++  show(`<div class="ribbon">Remove ads</div><h2>Play without interruptions</h2>
++    <p>Remove banner and interstitial ads and get 100 diamonds.</p>
++    <div class="gempacks single-offer">${gemPackCard(REMOVE_ADS_PACK)}</div>
++    <p id="offerStatus" role="status" hidden></p>
++    <div class="btns"><button class="btn alt" id="offerLater">Continue playing</button></div>`, el => {
++    const buy = el.querySelector(".gempack"), later = el.querySelector("#offerLater");
++    const status = el.querySelector("#offerStatus");
++    let left = false;
++    const finish = () => {
++      if (left) return;
++      left = true;
++      next();
++    };
++    later.onclick = finish;
++    buy.onclick = async () => {
++      buy.disabled = true;
++      status.hidden = true;
++      if (await purchaseGemPack(REMOVE_ADS_PACK)) { finish(); return; }
++      if (left) return;
++      status.textContent = "Purchase not completed.";
++      status.hidden = false;
++      buy.disabled = false;
++    };
++  });
++}
++
+@@ -2542 +2613,0 @@
+-  const price = p => (window.FlowerFeverStore && window.FlowerFeverStore.prices && window.FlowerFeverStore.prices[p.id]) || p.price;
+@@ -2550 +2621 @@
+-    <div class="gempacks">${GEM_PACKS.filter(p => !(p.noAds && save.noAds) && !(p.starter && !starterOpen())).map(p => `<button class="gempack${p.noAds ? " noads" : ""}${p.starter ? " starter" : ""}" data-i="${GEM_PACKS.indexOf(p)}">${p.tag ? `<em>${p.tag}</em>` : ""}<span class="gpic">${GEM_SVG.repeat(p.n >= 150 ? 3 : p.n >= 50 ? 2 : 1)}</span><b>${p.n}</b><small>diamonds</small>${p.noAds ? `<strong>+ No forced ads</strong>` : p.lives ? `<strong>+ ${p.lives} free lifelines</strong>` : ""}<i>${price(p)}</i></button>`).join("")}</div>
++    <div class="gempacks">${GEM_PACKS.filter(p => !(p.noAds && save.noAds) && !(p.starter && !starterOpen())).map(gemPackCard).join("")}</div>
+@@ -2556,2 +2627,8 @@
+-    el.querySelectorAll(".gempack").forEach(b => b.onclick = async () => { const p = GEM_PACKS[+b.dataset.i]; if (await buyPack(p)) { track("purchase", { id: p.id, price: p.price }); addGems(p.n); if (p.noAds) { save.noAds = true; try { window.FlowerFeverAds && window.FlowerFeverAds.hideBanner && window.FlowerFeverAds.hideBanner(); } catch (e) {} }
+-      if (p.lives) save.freeLife = freeLives() + p.lives; if (p.starter) save.starterBought = true; persist(); sfx("win"); } done(); });
++    el.querySelectorAll(".gempack").forEach(button => button.onclick = async () => {
++      if (el.dataset.buying) return;
++      el.dataset.buying = "1";
++      button.disabled = true;
++      try { await purchaseGemPack(GEM_PACKS[+button.dataset.i]); }
++      finally { delete el.dataset.buying; }
++      if (!overlay.hidden && el.contains(button)) done();
++    });
+@@ -2569,2 +2646,2 @@
+-  if (p.color >= 0 && p.type !== "bomb") collectColor(p.color, p.r, p.c);
+-  sfx("pop", comboLevel);
++  if (p.color >= 0 && p.type !== "bomb") collectColor(p.color, p.r, p.c, opts.silent);
++  if (!opts.silent) sfx("pop", comboLevel);
+@@ -2594 +2671 @@
+-function trigger(p, next, bees) {
++function trigger(p, next, bees, finishWrap = false) {
+@@ -2596,0 +2674 @@
++  if (inShower) boardPetals(r, c, 36);
+@@ -2605 +2683 @@
+-      fxRing(r, c, R, p.color); burst(r, c, p.color, 14, 1.6); sfx("boom"); shake(R > 1 ? 10 : 6);
++      fxRing(r, c, R, p.color); if (!inShower) burst(r, c, p.color, 14, 1.6); sfx("boom"); shake(R > 1 ? 10 : 6);
+@@ -2607 +2685 @@
+-      if (!p.armed) p.armed = true; else { p.fired = true; destroy(p); }
++      if (!p.armed && !finishWrap) p.armed = true; else { p.fired = true; destroy(p); }
+@@ -2612 +2690 @@
+-      ts.forEach(([tr, tc], i) => fxBolt(r, c, tr, tc, i * 18)); sfx("bomb"); destroy(p);
++      (inShower ? ts.slice(0, 1) : ts).forEach(([tr, tc], i) => fxBolt(r, c, tr, tc, i * 18)); sfx("bomb"); destroy(p);
+@@ -2621 +2699 @@
+-async function blast(cells, together = false, direct = false) {   // direct: the Flower Shower firing its chosen power-up
++async function blast(cells, together = false, direct = false, scoreOnly = []) {   // direct: the Flower Shower firing its chosen power-up
+@@ -2622,0 +2701,7 @@
++  if (!inShower && cells.length) {
++    let r = 0, c = 0;
++    for (const cell of cells) { r += cell[0]; c += cell[1]; }
++    boardPetals(r / cells.length, c / cells.length, 12);
++  }
++  // The lead special supplies the group animation. Avoid per-flower bursts and audio in its clear wave.
++  const groupClear = scoreOnly.length ? { noAnim: true, silent: true } : undefined;
+@@ -2631 +2716 @@
+-      if (p.frozen) { thaw(p); destroy(p); continue; }
++      if (p.frozen) { thaw(p); destroy(p, groupClear); continue; }
+@@ -2633 +2718 @@
+-      else destroy(p);
++      else destroy(p, groupClear);
+@@ -2655,2 +2740,14 @@
+-      await sleep(inShower || direct ? 200 : charging.length > 1 ? 380 : CHARGE_MS);
+-      p.charge = 0; if (grid[p.r][p.c] === p && !p.fired) { if (p.type === "bomb") rainbowFired = true; trigger(p, next, bees); }
++      await sleep(direct ? 200 : charging.length > 1 ? 380 : CHARGE_MS);
++      p.charge = 0;
++      if (inShower) await waitForShowerBeat();
++      if (inShower && showerSkip) break;
++      if (grid[p.r][p.c] === p && !p.fired) {
++        if (inShower) beginShowerEffect();
++        if (p.type === "bomb") rainbowFired = true;
++        for (const tile of scoreOnly) {
++          if (!tile.armed) countSpecial(kind(tile), tile.r, tile.c, true);
++          popup(tile.r, tile.c, ppp(), tile.color);
++          destroy(tile, { noAnim: true, silent: true });
++        }
++        trigger(p, next, bees, scoreOnly.length > 0);
++      }
+@@ -2658 +2755 @@
+-    together = together || rainbowFired;
++    together = !inShower && (together || rainbowFired);
+@@ -2661 +2758 @@
+-    await sleep(inShower ? 110 : 170);
++    if (!inShower) await sleep(170);
+@@ -2686,0 +2784,18 @@
++  if (inShower) {
++    for (const { cells, per } of list) {
++      for (const [r, c] of cells) {
++        for (let i = 0; i < per; i++) {
++          await waitForShowerBeat();
++          beginShowerEffect();
++          await flyBee(r, c, palette[rnd(palette.length)]);
++        }
++      }
++      for (const [r, c] of cells) {
++        ground[r][c] = 0;
++        groundType[r][c] = 0;
++        delete hiveAt[r * COLS + c];
++      }
++    }
++    sfx("crack");
++    return true;
++  }
+@@ -2752 +2867,2 @@
+-  const fl = { sx: c, sy: r, ex: tg[1], ey: tg[0], t0: T(), dur: BEE_MS, color };
++  const flightMs = BEE_MS;
++  const fl = { sx: c, sy: r, ex: tg[1], ey: tg[0], t0: T(), dur: fastFwd ? flightMs / SHOWER_FAST_SPEED : flightMs, color };
+@@ -2754,2 +2870,2 @@
+-  await sleep(BEE_MS);
+-  fxRing(tg[0], tg[1], 0, color); burst(tg[0], tg[1], color, 8, 1.4); sfx("sting");
++  await sleep(flightMs);
++  fxRing(tg[0], tg[1], 0, color); if (!inShower) burst(tg[0], tg[1], color, 8, 1.4); sfx("sting");
+@@ -2861,0 +2978 @@
++function staysInShower(p) { return inShower && p && p.type !== "normal"; }
+@@ -2874 +2991,3 @@
+-        const p = grid[y][c]; if (!p) continue;
++        const p = grid[y][c]; if (!p || staysInShower(p)) continue;
++        // Falling flowers pass through stationary shower specials without replacing them.
++        while (staysInShower(grid[write][c])) write--;
+@@ -2879 +2998 @@
+-        for (let y = write; y >= top; y--) { const p = newPiece(refillColor(y, c)); grid[y][c] = p; p.r = y; p.c = c; p.px = c; p.py = top - 1 - spawnK[c]++ * 1.15; p.falling = true; moved = true; ch = true; }
++        for (let y = write; y >= top; y--) { if (staysInShower(grid[y][c])) continue; const p = newPiece(refillColor(y, c)); grid[y][c] = p; p.r = y; p.c = c; p.px = c; p.py = top - 1 - spawnK[c]++ * 1.15; p.falling = true; moved = true; ch = true; }
+@@ -2886 +3005 @@
+-    if (!src || src.frozen || grid[nr][nc] || mask[nr][nc] !== 1 || ground[nr][nc] > 0) return;
++    if (!src || src.frozen || staysInShower(src) || grid[nr][nc] || mask[nr][nc] !== 1 || ground[nr][nc] > 0) return;
+@@ -2977 +3096 @@
+-      const p = grid[r - 1][sc]; if (!p || p.frozen || used.has(p.id)) continue;
++      const p = grid[r - 1][sc]; if (!p || p.frozen || staysInShower(p) || used.has(p.id)) continue;
+@@ -3009 +3128 @@
+-      if (nx) { nx.later = false; await sleep(250); if (grid[nx.r][nx.c] === nx && !nx.fired) await blast([[nx.r, nx.c]], false, true); continue; }
++      if (nx) { nx.later = false; await sleep(CASCADE_SPECIAL_DELAY_MS); if (grid[nx.r][nx.c] === nx && !nx.fired) await blast([[nx.r, nx.c]], false, true); continue; }
+@@ -3011 +3130 @@
+-    const armed = []; eachPiece((p, r, c) => { if (p.armed) armed.push([r, c]); });
++    const armed = []; eachPiece((p, r, c) => { if (!inShower && p.armed) armed.push([r, c]); });
+@@ -3014 +3133 @@
+-    if (groups.length) { cascades++; comboLevel = Math.max(comboLevel, cascades); chainCount += swapCells ? 0 : groups.length; if (inShower) celebrate(Math.min(9, showerHeat + cascades)); else if (cascades >= 2) celebrate(Math.min(9, cascades)); }
++    if (groups.length) { cascades++; comboLevel = Math.max(comboLevel, cascades); chainCount += swapCells ? 0 : groups.length; if (!inShower && cascades >= 2) celebrate(Math.min(9, cascades)); }
+@@ -3028 +3147 @@
+-      popup(sr / g.cells.length, sc / g.cells.length,g.cells.length * ppp() + (type ? 60 : 0), anyP ? anyP.color : -1);
++      popup(sr / g.cells.length, sc / g.cells.length,g.cells.length * ppp() + (spawn ? 60 : 0), anyP ? anyP.color : -1);
+@@ -3160 +3279 @@
+-let showerHeat = 0, showerT0 = 0;
++let showerT0 = 0;
+@@ -3167 +3286 @@
+-ffBtn.onclick = e => { e.stopPropagation(); fastFwd = !fastFwd; ffBtn.classList.toggle("on", fastFwd); ffBtn.innerHTML = fastFwd ? "<span>⏩</span> 3×" : "<span>⏩</span> Fast"; };
++ffBtn.onclick = e => { e.stopPropagation(); fastFwd = !fastFwd; ffBtn.classList.toggle("on", fastFwd); ffBtn.innerHTML = fastFwd ? "<span>⏩</span> " + SHOWER_FAST_SPEED + "×" : "<span>⏩</span> Fast"; };
+@@ -3170 +3289,16 @@
+-async function popAllSpecials() {   // every power-up on the board goes off — one at a time, letting the flowers fall in between
++const CASCADE_SPECIAL_DELAY_MS = 250;
++const SHOWER_EFFECT_MS = 500;
++let showerEffectAt = -Infinity;
++async function waitForShowerBeat() {
++  if (showerTurbo || showerSkip) return;
++  const speed = fastFwd ? SHOWER_FAST_SPEED : 1;
++  const remaining = showerEffectAt + SHOWER_EFFECT_MS / speed - T();
++  if (remaining <= 0) return;
++  const started = gameNow();
++  await sleep(remaining * speed);
++  showerT0 += gameNow() - started;
++}
++function beginShowerEffect() {
++  showerEffectAt = T();
++}
++async function popAllSpecials() {
+@@ -3172,2 +3306,11 @@
+-    const sp = []; eachPiece((p, r, c) => { if (p.type !== "normal" && !p.frozen) { p.shield = false; sp.push(p); } });
+-    if (!sp.length) break;
++    const specials = [];
++    eachPiece(p => {
++      if (p.type !== "normal" && !p.frozen && !p.fired) {
++        p.shield = false;
++        specials.push(p);
++      }
++    });
++    if (!specials.length) break;
++    // Lit-up power-ups go first, then the oldest. A rainbow hit only queues others.
++    specials.sort((a, b) => (a.marked || 1e15) - (b.marked || 1e15) || (a.pop || 0) - (b.pop || 0));
++    const p = specials[0];
+@@ -3175,16 +3318,14 @@
+-    // power-ups touching each other team up into their combo effect instead of going off alone
+-    let pair = null;
+-    for (const a of sp) { for (const [dr, dc] of [[0, 1], [1, 0]]) { const b = grid[a.r + dr] && grid[a.r + dr][a.c + dc]; if (b && b.type !== "normal" && !b.frozen && !b.fired) { pair = [a, b]; break; } } if (pair) break; }
+-    if (pair) { const [a, b] = pair; await doCombo(a, b, [b.r, b.c]); await resolve(null); continue; }
+-    // a very long shower wraps up: whatever is left goes off together
+-    if (gameNow() - showerT0 > 30000) { await blast(sp.map(q => [q.r, q.c]), true); await resolve(null); continue; }   // safety net only
+-    // lit-up ones (already hit) go first, in the order they were hit
+-    // then the oldest first (so power-ups low on the board never get left waiting behind new ones)
+-    sp.sort((a, b) => (a.marked || 1e15) - (b.marked || 1e15) || (a.pop || 0) - (b.pop || 0));
+-    // a big pile (they gather at the bottom as flowers fall): up to 4 go off back to back before the flowers fall, so the shower keeps moving
+-    const n = sp.length >= 12 ? 4 : sp.length >= 6 ? 2 : 1, pick = [];
+-    for (const q of sp) { if (pick.length >= n) break; if (pick.every(o => Math.abs(o.r - q.r) + Math.abs(o.c - q.c) > 1)) pick.push(q); }
+-    pick.forEach(q => { q.marked = 0; });
+-    await blast(pick.map(q => [q.r, q.c]), false, true);
+-    await resolve(null);              // gravity + any matches before the next power-up fires
+-    await sleep(60);
++    // Collect the entire side-connected group before the blast or gravity changes the grid.
++    const available = new Set(specials);
++    available.delete(p);
++    const group = [p];
++    for (const tile of group) {
++      for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
++        const neighbor = grid[tile.r + dr]?.[tile.c + dc];
++        if (available.delete(neighbor)) group.push(neighbor);
++      }
++    }
++    p.marked = 0;
++    await sleep(CASCADE_SPECIAL_DELAY_MS);
++    await blast([[p.r, p.c]], false, true, group.slice(1));
++    await resolve(null);
+@@ -3197 +3338 @@
+-  inShower = true; showerT0 = gameNow(); showerCalm = false; showerSkip = false; showerTurbo = false; turboCover(false); bigShown = Math.max(bigShown, 0); chainCount = 0; luckyRefill = showerGen === 3 ? .45 : showerGen === 2 ? .22 : 0;   // ending refills are plain random now (no extra lucky cascades)
++  inShower = true; showerEffectAt = -Infinity; showerT0 = gameNow(); showerCalm = false; showerSkip = false; showerTurbo = false; turboCover(false); bigShown = Math.max(bigShown, 0); chainCount = 0; luckyRefill = showerGen === 3 ? .45 : showerGen === 2 ? .22 : 0;   // ending refills are plain random now (no extra lucky cascades)
+@@ -3200 +3341 @@
+-  const left = moves; showerHeat = Math.min(6, 1 + Math.floor(left / 3));
++  const left = moves;
+@@ -3202 +3343 @@
+-  if (left > 0) { praise("Flower Shower!"); celebrate(showerHeat + 1); }
++  if (left > 0) praise("Flower Shower!");
+@@ -3205,2 +3346 @@
+-  // first, set off the power-ups already on the board (one by one, ~0.25 s apart) before any moves turn into new ones.
+-  // Same rhythm as the converted moves: let the last match settle, light each one up in turn, then fire them in sequence.
++  // Finish the previous cascade before firing the existing power-ups.
+@@ -3208,4 +3347,0 @@
+-  for (let w = 0; w < 30 && !showerSkip && (drift.length || parts.some(q => q.kind === "petal")); w++) await sleep(80);
+-  { const ex = []; eachPiece(p => { if (p.type !== "normal") ex.push(p); });
+-    for (const p of ex) { if (showerSkip) break; p.pop = T(); sparkleAt(p.r, p.c, 8); sfx("convert", ex.indexOf(p)); await sleep(140); }
+-    if (ex.length) await sleep(250); }
+@@ -3213,2 +3349 @@
+-  // let the petals settle before the leftover moves turn into new power-ups
+-  for (let w = 0; w < 50 && !showerSkip && (drift.length || parts.some(q => q.kind === "petal")); w++) await sleep(80);
++  await waitForShowerBeat();
+@@ -3221,8 +3356,16 @@
+-    // spread the converted moves out: never next to another power-up if there is room;
+-    // when it must sit beside one, give it a different power (line vs bouquet)
+-    const nbr = q => [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]].map(([dy, dx]) => grid[q.r + dy] && grid[q.r + dy][q.c + dx]).filter(z => z && z.type !== "normal");
+-    const lonely = ns.filter(q => !nbr(q).length);
+-    const p = lonely.length ? lonely[rnd(lonely.length)] : ns[rnd(ns.length)];
+-    const near = nbr(p).map(z => z.type), hasLine = near.some(t => t === "stripeH" || t === "stripeV"), hasWrap = near.includes("wrap");
+-    p.type = !near.length ? (Math.random() < .5 ? "stripeH" : "stripeV") : hasLine && !hasWrap ? "wrap" : !hasLine ? (Math.random() < .5 ? "stripeH" : "stripeV") : "bee";
+-    p.pop = T(); sparkleAt(p.r, p.c, 8);
++    const spaced = ns.filter(p => !hasNearbySpecial(p.r, p.c));
++    if (!spaced.length) {
++      // Clear the current batch to make room, then retry the remaining moves.
++      await popAllSpecials();
++      let room = false;
++      eachPiece(q => { if (q.type === "normal" && !q.frozen && !hasNearbySpecial(q.r, q.c)) room = true; });
++      if (!room) {
++        moves--;
++        score += 900;
++        updateHud();
++      }
++      continue;
++    }
++    const p = spaced[rnd(spaced.length)];
++    p.type = Math.random() < .5 ? "stripeH" : "stripeV";
++    p.pop = T();
+@@ -3230,3 +3373,2 @@
+-    await sleep(150);
+-  }
+-  const tStart = T();
++    await sleep(250);
++  }
+@@ -3245,0 +3388,13 @@
++  await waitForShowerBeat();
++  if (left > 0 && !showerSkip && !showerTurbo) {
++    beginShowerEffect();
++    const b = $("#frame").getBoundingClientRect();
++    const cx = b.left + b.width * .5, cy = b.top + b.height * .3;
++    for (let i = 0; i < 12; i++) {
++      const a = i / 12 * TAU, v = .28 + Math.random() * .22;
++      pops.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .14,
++        ci: rnd(6), size: 20 + Math.random() * 16, rot: 0, vr: (Math.random() - .5) * .012, life: 0, max: SHOWER_EFFECT_MS });
++    }
++    sfx("fever", 3);
++    await waitForShowerBeat();
++  }
+@@ -3247,13 +3402,6 @@
+-  // finale: one firework per move that was left (up to 12)
+-  if (showerTurbo) { showerTurbo = false; turboCover(false); fx = []; flyers = []; sfx("win"); }
+-  if (left > 0 && !showerSkip && !showerTurbo) {
+-    const b = $("#frame").getBoundingClientRect();
+-    const fw = Math.ceil(Math.min(12, left) * .75);
+-    for (let k = 0; k < fw; k++) setTimeout(() => {
+-      const cx = b.left + b.width * (.1 + Math.random() * .8), cy = b.top + b.height * (.05 + Math.random() * .7);
+-      for (let i = 0; i < 6 && pops.length < 80 * qf(); i++) { const a = i / 6 * TAU, v = .28 + Math.random() * .22; pops.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .14, ci: rnd(6), size: 20 + Math.random() * 16, rot: 0, vr: (Math.random() - .5) * .012, life: 0, max: 1400 }); }
+-      sfx("fever", 3 + (k % 4));
+-    }, k * 210);
+-    await sleep(Math.max(Math.min(12, left) * 170, fw * 210) + 500);
+-  }
+-  inShower = false; luckyRefill = 0; showerHeat = 0; showerCalm = false; celebrateEnd();
++  if (showerTurbo) {
++    showerTurbo = false; turboCover(false);
++    fx = []; flyers = []; parts = []; pops = [];
++    sfx("win");
++  }
++  inShower = false; luckyRefill = 0; showerCalm = false; celebrateEnd();
+@@ -3555,0 +3704,19 @@
++const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.alxmobileapps.flowerfever";
++let ratingPromptSeen = false;
++function afterRatedMilestone(next) {
++  const native = window.Capacitor?.isNativePlatform?.() && window.Capacitor?.getPlatform?.() === "android";
++  if (!native || save.unlocked < 16 || ratingPromptSeen) { next(); return; }
++  try { if (localStorage.getItem("ff.ratingPromptSeen")) { next(); return; } } catch (e) {}
++  ratingPromptSeen = true;
++  try { localStorage.setItem("ff.ratingPromptSeen", "1"); } catch (e) {}
++  show(`<div class="ribbon">Rate Flower Fever</div><h2>Leave a review</h2>
++    <p>Share your experience on Google Play.</p><div class="btns">
++    <button class="btn" id="ratePlay">Rate in Play Store</button>
++    <button class="btn alt" id="rateLater">Not now</button></div>`, el => {
++    el.querySelector("#rateLater").onclick = next;
++    el.querySelector("#ratePlay").onclick = () => {
++      openLink(PLAY_STORE_URL);
++      next();
++    };
++  });
++}
+@@ -3566 +3733 @@
+-  save.adWins = (save.adWins || 0) + 1;
++  countFinishedRound();
+@@ -3595,0 +3763 @@
++  const leaveWin = next => wasCh ? next() : afterRatedMilestone(next);
+@@ -3613 +3781 @@
+-      const n = el.querySelector("#next"); if (n) n.onclick = () => startLevel(levelIdx + 1);
++      const n = el.querySelector("#next"); if (n) n.onclick = () => leaveWin(() => startLevel(levelIdx + 1));
+@@ -3615 +3783 @@
+-      el.querySelector("#again").onclick = () => startLevel(levelIdx, wasCh);
++      el.querySelector("#again").onclick = () => leaveWin(() => startLevel(levelIdx, wasCh));
+@@ -3617 +3785 @@
+-      el.querySelector("#wHome").onclick = showHome;
++      el.querySelector("#wHome").onclick = () => leaveWin(showHome);
+@@ -3657 +3825 @@
+-  if (!again) { track("level_fail", { level: levelIdx + 1, continues: continued || 0, challenge }); sfx("lose"); setTimeout(() => say("So close!"), 950); save.fails = save.fails || {}; save.fails[levelIdx] = (save.fails[levelIdx] || 0) + 1; persist(); }
++  if (!again) { countFinishedRound(); track("level_fail", { level: levelIdx + 1, continues: continued || 0, challenge }); sfx("lose"); setTimeout(() => say("So close!"), 950); save.fails = save.fails || {}; save.fails[levelIdx] = (save.fails[levelIdx] || 0) + 1; persist(); }
+@@ -4461 +4629 @@
+-let homeOpen = false, homeRaf = 0;
++let homeOpen = false, homeRaf = 0, panoramaIntroPlayed = false;
+@@ -4523 +4691 @@
+-    <div class="h3map"><div class="h3scroll"><div class="h3strip">${HOME_PANELS.map((src, i) => `<img class="h3pano" alt="" draggable="false" src="${src}" style="left:${i * HOME_PANEL_STEP}%">`).join("")}<div class="h3labels"></div></div></div></div>
++    <div class="h3map"><div class="h3scroll"><div class="h3track"><div class="h3strip">${HOME_PANELS.map((src, i) => `<img class="h3pano" alt="" draggable="false" src="${src}" style="left:${i * HOME_PANEL_STEP}%">`).join("")}<div class="h3labels"></div></div></div></div></div>
+@@ -4539 +4707,35 @@
+-  const NG = PLAN_GARDENS.length;
++  const sc = el.querySelector(".h3scroll"), trackEl = el.querySelector(".h3track"), strip = el.querySelector(".h3strip");
++  // Mirror just the outer edge where centering the first or last pin needs more artwork.
++  const addEdge = (side, src) => {
++    const edge = document.createElement("div"), img = document.createElement("img");
++    edge.className = "h3edge " + side;
++    edge.setAttribute("aria-hidden", "true");
++    edge.hidden = true;
++    img.alt = "";
++    img.draggable = false;
++    img.src = src;
++    edge.appendChild(img);
++    trackEl.appendChild(edge);
++    return { edge, img };
++  };
++  const startEdge = addEdge("start", HOME_PANELS[0]), endEdge = addEdge("end", HOME_PANELS.at(-1));
++  const outbound = 9000 / (.75 * .75 * .5), pause = 250, inbound = 6500 / (.75 * .75 * .5);
++  const introDuration = outbound + pause + inbound;
++  let interrupted = false, introStart = null, center = 0, rightEnd = 0;
++  const stopPanorama = () => {
++    interrupted = true;
++    panoramaIntroPlayed = true;
++    cancelAnimationFrame(homeRaf);
++  };
++  for (const event of ["pointerdown", "wheel", "keydown"]) {
++    el.addEventListener(event, stopPanorama, { capture: true, passive: true, once: true });
++  }
++  const animatePanorama = now => {
++    if (interrupted || !el.isConnected) return;
++    if (introStart === null) introStart = now;
++    const elapsed = now - introStart;
++    const k = Math.min(1, Math.max(0, (elapsed - outbound - pause) / inbound));
++    sc.scrollLeft = elapsed < outbound ? rightEnd * elapsed / outbound
++      : rightEnd + (center - rightEnd) * (k * k * (3 - 2 * k));
++    if (k < 1) homeRaf = requestAnimationFrame(animatePanorama);
++  };
+@@ -4541 +4743,3 @@
+-    const sc = el.querySelector(".h3scroll"), vw = sc.clientWidth; if (!vw) return;
++    if (!el.isConnected) return;
++    const vw = sc.clientWidth;
++    if (!vw) return;
+@@ -4543 +4747 @@
+-      const map = el.querySelector(".h3map"), h3 = el.querySelector(".h3"), strip = el.querySelector(".h3strip");
++      const map = el.querySelector(".h3map"), h3 = el.querySelector(".h3");
+@@ -4547 +4751,16 @@
+-      strip.style.setProperty("width", (720.530387 * (base + mx) / base) + "%", "important");
++      const artWidth = vw * 7.20530387 * (base + mx) / Math.max(1, base);
++      const pin = PANO_POS[gi][2] / 100 * artWidth;
++      const leftPad = Math.max(0, vw / 2 - pin);
++      const rightPad = Math.max(0, vw / 2 - (artWidth - pin));
++      // Match the rendered panel width so the reflected edge has the same scale.
++      const panelWidth = artWidth * .2531468531;
++      for (const [{ edge, img }, width] of [[startEdge, leftPad], [endEdge, rightPad]]) {
++        edge.hidden = width === 0;
++        edge.style.width = width + "px";
++        img.style.width = panelWidth + "px";
++      }
++      strip.style.setProperty("width", artWidth + "px", "important");
++      strip.style.marginLeft = leftPad + "px";
++      trackEl.style.width = (artWidth + leftPad + rightPad) + "px";
++      center = leftPad + pin - vw / 2;
++      rightEnd = Math.max(0, leftPad + artWidth - vw);
+@@ -4553 +4772,9 @@
+-    if (!sc.dataset.placed) { sc.dataset.placed = 1; sc.scrollLeft = PANO_POS[gi][2] / 100 * sc.scrollWidth - vw / 2; }
++    if (!panoramaIntroPlayed) {
++      panoramaIntroPlayed = true;
++      if (!reduceMotion) {
++        sc.scrollLeft = 0;
++        homeRaf = requestAnimationFrame(animatePanorama);
++        return;
++      }
++    }
++    if (!interrupted && (introStart === null || performance.now() - introStart >= introDuration)) sc.scrollLeft = center;
+@@ -4556 +4783 @@
+-  el.querySelector("#hPlay").onclick = () => { if (lives() <= 0) { livesWindow(back, () => { closeHome(); startLevel(next); }); return; } closeHome(); const fresh = L && levelIdx === next && !challenge && movesUsed === 0 && moves === L.moves && score === 0; if (fresh) showStart(); else startLevel(next); };
++  el.querySelector("#hPlay").onclick = () => { if (lives() <= 0) { livesWindow(back, () => { closeHome(); startLevel(next); }); return; } closeHome(); const fresh = L && levelIdx === next && !challenge && movesUsed === 0 && moves === L.moves && score === 0; if (fresh && !interstitialDue(false, next)) showStart(); else startLevel(next); };
+@@ -4658 +4885 @@
+-    if (["#gBack", "#llClose", "#lfNo", "#sBack", "#cBack", "#lvBack", "#back", "#oNo", "#cfKeep", "#lvKeep", "#pResume", "#prDone", "#sDone", "#rOk", "#pOk", "#cOk", "#aOk", "#gok", "#gok2", "#sHome", "#lHome", "#wHome"].some(tap)) return true;
++    if (["#offerLater", "#rateLater", "#gBack", "#llClose", "#lfNo", "#sBack", "#cBack", "#lvBack", "#back", "#oNo", "#cfKeep", "#lvKeep", "#pResume", "#prDone", "#sDone", "#rOk", "#pOk", "#cOk", "#aOk", "#gok", "#gok2", "#sHome", "#lHome", "#wHome"].some(tap)) return true;
+@@ -4819 +5046 @@
+-  const want = adsAllowed() && !homeOpen && !mapOpen && (booted || !!gardenOpen);
++  const want = adsAllowed() && (!!gardenOpen || (!homeOpen && !mapOpen && booted && levelIdx >= 20));
+@@ -4826 +5053 @@
+-  if (A && typeof A.showInterstitial === "function") return Promise.resolve().then(() => A.showInterstitial()).catch(() => {});
++  if (A && typeof A.showInterstitial === "function") return Promise.resolve().then(() => A.showInterstitial()).catch(() => false);
+@@ -4832 +5059 @@
+-    btn.onclick = () => { el.remove(); res(); };
++    btn.onclick = () => { el.remove(); res(true); };
+@@ -4834,0 +5062,10 @@
++let roundCounted = false, interstitialPending = false;
++function countFinishedRound() {
++  if (roundCounted) return;
++  roundCounted = true;
++  if (levelIdx < 20) { save.adRounds = 0; return; }
++  save.adRounds = (save.adRounds ?? save.adWins ?? 0) + 1;
++}
++function interstitialDue(asChallenge, targetLevel = levelIdx) {
++  return booted && levelIdx >= 20 && targetLevel >= 20 && adsAllowed() && !asChallenge && (save.adRounds ?? save.adWins ?? 0) >= 5;
++}
+@@ -4835,0 +5073,16 @@
++  if (interstitialPending) return;
++  if (interstitialDue(asChallenge, i)) {
++    save.adRounds = 0;
++    persist();
++    busy = interstitialPending = true;
++    hide();
++    const next = () => {
++      interstitialPending = false;
++      startLevel(i, asChallenge);
++    };
++    showInterstitial().then(shown => {
++      if (shown && typeof window.FlowerFeverStore?.buy === "function") showRemoveAdsOffer(next);
++      else next();
++    });
++    return;
++  }
+@@ -4837,2 +5089,0 @@
+-  // between-level ad: after every 5 levels won (never for "No ads" buyers, never when the app first opens)
+-  if (booted && adsAllowed() && i >= 20 && !challenge && (save.adWins || 0) >= 5) { save.adWins = 0; persist(); busy = true; showInterstitial().then(() => startLevel(i, asChallenge)); return; }
+@@ -4839,0 +5091 @@
++  roundCounted = false;
+@@ -4842 +5094 @@
+-  levelIdx = i; movesUsed = 0; showerGen = 1; L = LEVELS[i]; buildLayout(L); palette = L.colors; moves = challenge ? Math.max(8, Math.round(L.moves * .85)) : L.moves; score = 0; comboLevel = 0; bigShown = 0; roundMaxCascade = 0; chainCount = 0;
++  levelIdx = i; syncBanner(); movesUsed = 0; showerGen = 1; L = LEVELS[i]; buildLayout(L); palette = L.colors; moves = challenge ? Math.max(8, Math.round(L.moves * .85)) : L.moves; score = 0; comboLevel = 0; bigShown = 0; roundMaxCascade = 0; chainCount = 0;
+@@ -5188 +5440 @@
+-  if (showerTurbo) for (let k = 0; k < 30; k++) { gameOff += 40; update(t, 40); } else update(t, fastFwd ? dt * 2.5 : dt); draw(t); drawParty(t, dt); syncBanner();
++  if (showerTurbo) for (let k = 0; k < 30; k++) { gameOff += 40; update(t, 40); } else update(t, fastFwd ? dt * SHOWER_FAST_SPEED : dt); draw(t); drawParty(t, dt); syncBanner();

@@ -1,0 +1,25 @@
+--- a/www/index.html
++++ b/www/index.html
+@@ -16,2 +16,3 @@
+ <script src="native.js"></script>
++<script src="board-webgl.js"></script>
+ <title>Flower Fever</title>
+@@ -1935,3 +1936,4 @@
+ /* ============ State ============ */
+-const canvas = $("#board"), ctx = canvas.getContext("2d");
++const canvas = $("#board"), boardRenderer = window.createFlowerBoardRenderer(canvas);
++const ctx = boardRenderer.ctx;
+ let CELL = 48, quality = 2;            // 2 = full, 1 = reduced, 0 = light (set automatically from the frame rate)
+@@ -4896,2 +4898,3 @@
+ function draw(t) {
++  boardRenderer.begin();
+   const S = CELL, W = S * COLS, H = S * ROWS;
+@@ -4918,3 +4921,3 @@
+   const liftedNow = [];
+-  ctx.save(); tileLayer(S); ctx.clip(tileCache.clip);
++  ctx.save(); tileLayer(S); boardRenderer.clip(tileCache.clip, mask, S * DPR);
+   const hintSet = hint ? new Set(hint.map(([r, c]) => r * COLS + c)) : null;
+@@ -5105,2 +5108,3 @@
+   ctx.globalAlpha = 1;
++  boardRenderer.end();
+ }

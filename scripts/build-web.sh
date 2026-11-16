@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Builds the final game page (www/index.html) from the base page + the game patches, then the iPhone changes.
+# Same patches, same order as the Android build 100 (minus the Android-only ones).
+set -euo pipefail
+git apply scripts/board-webgl.patch
+git apply scripts/celebration-polish.patch
+git apply scripts/webgl-effects.patch
+git apply --unidiff-zero scripts/home-and-offers.patch
+python3 scripts/patch-portal-refill.py
+python3 scripts/patch-board-layout.py
+python3 scripts/patch-garden-plants.py
+python3 scripts/patch-bouquets.py
+python3 scripts/patch-share-garden.py
+python3 scripts/patch-save-merge.py
+python3 scripts/patch-shower-combos.py
+python3 scripts/patch-bouquet-message.py
+python3 scripts/patch-fit-overlay.py
+python3 scripts/patch-garden-tutorial.py
+python3 scripts/patch-bee-help.py
+python3 scripts/patch-shuffle-goal.py
+python3 scripts/patch-switch-lifeline.py
+python3 scripts/patch-quiet-ads.py
+python3 scripts/patch-continue-7.py
+python3 scripts/patch-flower-size.py
+python3 scripts/patch-sharp-board.py
+python3 scripts/patch-collect-fix.py
+python3 scripts/patch-save-safety.py
+python3 scripts/patch-diagonal-fill.py
+python3 scripts/patch-coin-reward.py
+python3 scripts/patch-sell-kept.py
+python3 scripts/patch-voice-wait.py
+python3 scripts/patch-rate-again.py
+python3 scripts/patch-hive-burst.py
+python3 scripts/patch-open-quiet.py
+python3 scripts/patch-social.py
+python3 scripts/patch-no-corner-flowers.py
+python3 scripts/patch-home-rows.py
+python3 scripts/patch-portal-ends.py
+python3 scripts/patch-tutorial-coins.py
+python3 scripts/patch-ios.py

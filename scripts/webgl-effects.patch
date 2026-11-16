@@ -1,0 +1,29 @@
+--- a/www/index.html
++++ b/www/index.html
+@@ -1937,3 +1937,3 @@
+ const canvas = $("#board"), boardRenderer = window.createFlowerBoardRenderer(canvas);
+-const ctx = boardRenderer.ctx;
++let ctx = boardRenderer.ctx;
+ let CELL = 48, quality = 2;            // 2 = full, 1 = reduced, 0 = light (set automatically from the frame rate)
+@@ -2129,3 +2129,4 @@
+ /* ---- Cascade celebration: the longer the chain, the more the board blooms ---- */
+-const party = $("#party"), pctx = party.getContext("2d");
++const party = $("#party"), partyRenderer = window.createFlowerBoardRenderer(party, true);
++let pctx = partyRenderer.ctx;
+ let fever = 0, blooms = [], drift = [], pops = [], feverOff = null;
+@@ -2187,4 +2188,5 @@
+   if (!busyParty && !partyDirty) return;
++  partyRenderer.begin(); pctx = partyRenderer.ctx;
+   pctx.setTransform(PDPR(), 0, 0, PDPR(), 0, 0); pctx.clearRect(0, 0, W, H);
+-  partyDirty = !!busyParty; if (!busyParty) return;
++  partyDirty = !!busyParty; if (!busyParty) { partyRenderer.end(); return; }
+   for (let i = drift.length - 1; i >= 0; i--) {
+@@ -2220,2 +2222,3 @@
+   }
++  partyRenderer.end();
+ }
+@@ -4901,3 +4904,3 @@
+ function draw(t) {
+-  boardRenderer.begin();
++  boardRenderer.begin(); ctx = boardRenderer.ctx;
+   const S = CELL, W = S * COLS, H = S * ROWS;
