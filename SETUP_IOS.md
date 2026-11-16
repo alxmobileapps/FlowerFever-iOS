@@ -64,7 +64,7 @@ Firebase console → the Flower Fever project:
 2. Download **GoogleService-Info.plist** and add it to the root of this repo.
 3. Authentication → Sign-in method → turn on **Apple** (Google and Anonymous are already on).
 
-Without the file the app still builds and plays, just without sign-in, cloud save and friends.
+Done: the iOS app is registered and the file is in the repo; Apple sign-in is on.
 
 ## 5. AdMob
 AdMob → Apps → **Add app → iOS** (Flower Fever), then make 3 ad units: Banner, Interstitial, Rewarded.
