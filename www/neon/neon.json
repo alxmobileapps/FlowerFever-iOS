@@ -1,0 +1,146 @@
+{
+ "logo": {
+  "Flower": {
+   "src": "logo-flower.webp",
+   "w": 4.2869,
+   "h": 2.9439,
+   "m": 0.6,
+   "va": -0.4464
+  },
+  "Fever": {
+   "src": "logo-fever.webp",
+   "w": 3.6368,
+   "h": 2.9439,
+   "m": 0.6,
+   "va": -0.4464
+  }
+ },
+ "praise": {
+  "Lovely!": {
+   "src": "praise-lovely.webp",
+   "w": 6.091,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Blooming!": {
+   "src": "praise-blooming.webp",
+   "w": 7.25,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Gorgeous!": {
+   "src": "praise-gorgeous.webp",
+   "w": 7.166,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Dazzling!": {
+   "src": "praise-dazzling.webp",
+   "w": 6.9329,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Wow!": {
+   "src": "praise-wow.webp",
+   "w": 5.584,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Buzzing!": {
+   "src": "praise-buzzing.webp",
+   "w": 6.5901,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Flower Shower!": {
+   "src": "praise-flower-shower.webp",
+   "w": 9.8262,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Hurry!": {
+   "src": "praise-hurry.webp",
+   "w": 5.9539,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Petal Storm!": {
+   "src": "praise-petal-storm.webp",
+   "w": 8.618,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Shuffle!": {
+   "src": "praise-shuffle.webp",
+   "w": 6.3431,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Tap two flowers": {
+   "src": "praise-tap-two-flowers.webp",
+   "w": 9.6411,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Amazing!": {
+   "src": "praise-amazing.webp",
+   "w": 6.8759,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Magnificent!": {
+   "src": "praise-magnificent.webp",
+   "w": 8.4751,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  },
+  "Phenomenal!": {
+   "src": "praise-phenomenal.webp",
+   "w": 8.378,
+   "h": 3.5498,
+   "pt": 1.0,
+   "pl": 1.45,
+   "pr": 1.45,
+   "pb": 1.0
+  }
+ }
+}
