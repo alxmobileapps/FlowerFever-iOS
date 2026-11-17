@@ -39,6 +39,7 @@ python3 scripts/patch-portal-ends.py
 python3 scripts/patch-tutorial-coins.py
 python3 scripts/patch-bgm-webaudio.py
 python3 scripts/patch-ugc-safety.py
+python3 scripts/patch-ad-levels.py
 python3 scripts/patch-neon-images.py
 python3 scripts/patch-ios.py
 python3 scripts/ios/scrub_platform.py
