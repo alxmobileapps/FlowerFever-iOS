@@ -404,6 +404,48 @@
   const Rev = P('InAppReview');
   if (Rev) window.FlowerFeverReview = () => { try { Rev.requestReview(); } catch (e) { log('review', e); } };
 
+  /* ---------- Forced update: when the store has a newer version, it must be installed before playing ---------- */
+  // Android: Google Play's own full-screen update. iPhone: compares with the App Store version and opens the App Store.
+  const AU = P('AppUpdate');
+  if (AU) {
+    const ios = C.getPlatform && C.getPlatform() === 'ios';
+    const newer = (a, b) => { const x = String(a || '').split('.').map(Number), y = String(b || '').split('.').map(Number);
+      for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d > 0; } return false; };
+    let shown = false;
+    const goStore = async () => {
+      try {
+        if (!ios) {
+          const i = await AU.getAppUpdateInfo();
+          if (i.immediateUpdateAllowed && (i.updateAvailability === 2 || i.updateAvailability === 3)) { await AU.performImmediateUpdate(); return; }
+          await AU.openAppStore();
+        } else if (window.FF_APPSTORE_ID) await AU.openAppStore({ appId: String(window.FF_APPSTORE_ID) });
+        else window.open('https://apps.apple.com/', '_system');
+      } catch (e) { log('update open', e); }
+    };
+    const block = () => {
+      if (shown) return; shown = true;
+      const d = document.createElement('div'); d.id = 'ffUpdate';
+      d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:rgba(60,20,40,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)';
+      d.innerHTML = '<div style="background:#fff7fb;border-radius:22px;padding:26px 22px;width:min(84vw,340px);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)">'
+        + '<div style="font-weight:800;font-size:22px;color:#4a1430;margin:4px 0 8px">Update available</div>'
+        + '<div style="color:#6b3a52;font-size:15px;line-height:1.4;margin-bottom:18px">A new version of Flower Fever is ready. Please update to keep playing.</div>'
+        + '<button id="ffUpdBtn" style="border:0;border-radius:999px;padding:13px 30px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(#ff7eb3,#e8457f);box-shadow:0 4px 0 #b52d63">Update now</button></div>';
+      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(ev => d.addEventListener(ev, e => { if (e.target.id !== 'ffUpdBtn') e.stopPropagation(); }, true));
+      document.body.appendChild(d); d.querySelector('#ffUpdBtn').onclick = goStore;
+    };
+    const check = async () => {
+      try {
+        const i = await AU.getAppUpdateInfo();
+        const has = ios ? newer(i.availableVersionName, i.currentVersionName) : (i.updateAvailability === 2 || i.updateAvailability === 3);
+        if (!has) return;
+        block();
+        if (!ios && i.immediateUpdateAllowed) { try { await AU.performImmediateUpdate(); } catch (e) { log('update', e); } }
+      } catch (e) { log('update check', e); }   // no store info (e.g. not installed from the store): play on
+    };
+    setTimeout(check, 1500);
+    const AppU = P('App'); if (AppU && AppU.addListener) AppU.addListener('resume', () => { if (!shown) check(); });
+  }
+
   /* ---------- Android back button: close the open window, or ask before leaving ---------- */
   const App = P('App');
   if (App) App.addListener('backButton', () => {

@@ -40,3 +40,13 @@ if NEED_APPLE_SIGNIN:
             "attributes": {"capabilityType": "APPLE_ID_AUTH", "settings": [{"key": "APPLE_ID_AUTH_APP_CONSENT", "options": [{"key": "PRIMARY_APP_CONSENT"}]}]},
             "relationships": {"bundleId": {"data": {"type": "bundleIds", "id": bundle["id"]}}}}})
         print("Sign in with Apple: turned on")
+
+# The App Store app id (the number in apps.apple.com/app/id...) for the in-app "Update now" button.
+out = os.environ.get("APPSTORE_ID_JS")
+if out:
+    apps = call("GET", "/v1/apps", params={"filter[bundleId]": BUNDLE_ID, "limit": 5})["data"]
+    if apps:
+        open(out, "w").write('window.FF_APPSTORE_ID = "%s";\n' % apps[0]["id"])
+        print("App Store app id:", apps[0]["id"])
+    else:
+        print("App Store app id: no app record yet")

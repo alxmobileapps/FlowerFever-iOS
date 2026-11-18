@@ -122,7 +122,7 @@ jobs:
           { echo "-----BEGIN PRIVATE KEY-----"; printf '%s\n' "$(printf '%s' "$BODY" | fold -w 64)"; echo "-----END PRIVATE KEY-----"; } > "$KEY_PATH"
           pip3 install --quiet --break-system-packages pyjwt cryptography requests 2>/dev/null || pip3 install --quiet pyjwt cryptography requests
           FLAG=""; [ -f GoogleService-Info.plist ] && FLAG="--apple-signin"
-          ASC_KEY_PATH="$KEY_PATH" python3 scripts/ios/apple_id.py $FLAG
+          ASC_KEY_PATH="$KEY_PATH" APPSTORE_ID_JS="ios/App/App/public/appstore-id.js" python3 scripts/ios/apple_id.py $FLAG
 
       - name: Build release archive (signed at export)
         if: steps.signing_check.outputs.has_apple == 'true'
