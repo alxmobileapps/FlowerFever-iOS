@@ -418,8 +418,11 @@
           const i = await AU.getAppUpdateInfo();
           if (i.immediateUpdateAllowed && (i.updateAvailability === 2 || i.updateAvailability === 3)) { await AU.performImmediateUpdate(); return; }
           await AU.openAppStore();
-        } else if (window.FF_APPSTORE_ID) await AU.openAppStore({ appId: String(window.FF_APPSTORE_ID) });
-        else window.open('https://apps.apple.com/', '_system');
+        } else {
+          let id = '';
+          try { id = (await (await fetch('appstore-id.json', { cache: 'no-store' })).json()).id; } catch (e) {}   // written during the build
+          if (id) await AU.openAppStore({ appId: String(id) }); else window.open('https://apps.apple.com/', '_system');
+        }
       } catch (e) { log('update open', e); }
     };
     const block = () => {

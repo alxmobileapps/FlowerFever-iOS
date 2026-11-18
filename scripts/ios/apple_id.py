@@ -46,7 +46,7 @@ out = os.environ.get("APPSTORE_ID_JS")
 if out:
     apps = call("GET", "/v1/apps", params={"filter[bundleId]": BUNDLE_ID, "limit": 5})["data"]
     if apps:
-        open(out, "w").write('window.FF_APPSTORE_ID = "%s";\n' % apps[0]["id"])
+        open(out, "w").write('{"id": "%s"}\n' % apps[0]["id"])
         print("App Store app id:", apps[0]["id"])
     else:
         print("App Store app id: no app record yet")
