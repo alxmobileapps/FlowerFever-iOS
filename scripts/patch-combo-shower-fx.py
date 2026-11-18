@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Two effects (Nov 2026):
-1. Striped bloom + Bouquet combo: the flower comes out of the Bouquet's box (the box stays put, normal
-   size), moves to the centre of the blast, and grows while it spins for 1 second; then the striped
-   beams go out in all directions (same blast as before).
+1. Striped bloom + Bouquet combo: only the Bouquet's flower (not its box) grows while it spins for
+   1 second in the Bouquet's own space; then the striped beams go out in all directions from that
+   same space (3 rows + 3 columns centred on the Bouquet).
 2. Flower Shower: every power-up that is sitting still on the board (including the ones made from
    the moves left) is lifted and highlighted, like a tapped tile, until it goes off."""
 import pathlib, sys
@@ -19,15 +19,17 @@ def swap(old, new):
 # 1) Bouquet grows and spins for 1 s before the stripe + bouquet blast
 swap('    a.fired = b.fired = true; countSpecial("stripe", r, c); countSpecial("wrap", r, c);\n    destroy(a); destroy(b); praise("Gorgeous!");',
      '    a.fired = b.fired = true; countSpecial("stripe", r, c); countSpecial("wrap", r, c);\n'
-     '    { const bq = kind(a) === "wrap" ? a : b; bq.spinAt = [r, c]; bq.spinGrow = T(); sfx("charge"); await sleep(inShower && showerSkip ? 150 : 1000); bq.spinGrow = 0; }\n'
+     '    { const bq = kind(a) === "wrap" ? a : b; bq.spinGrow = T(); sfx("charge"); await sleep(inShower && showerSkip ? 150 : 1000); bq.spinGrow = 0; }\n'
      '    destroy(a); destroy(b); praise("Gorgeous!");')
+swap('    for (let d = -1; d <= 1; d++) { const lh = lineCells(r + d, c, "h"), lv = lineCells(r, c + d, "v");',
+     '    const bq = kind(a) === "wrap" ? a : b, br = bq.r, bc = bq.c;   // beams start from the Bouquet\'s space\n'
+     '    for (let d = -1; d <= 1; d++) { const lh = lineCells(br + d, bc, "h"), lv = lineCells(br, bc + d, "v");')
 swap('  const liftedNow = [];', '  const liftedNow = [], spinNow = [];')
 swap('    if (p.charge) { chargingNow.push(p); continue; }',
      '    if (p.spinGrow) spinNow.push(p);   // its box is still drawn in place; the flower is drawn on top below\n    if (p.charge) { chargingNow.push(p); continue; }')
-swap('  for (const p of liftedNow) {', r'''  for (const p of spinNow) {   // Striped bloom + Bouquet: the flower leaves its box, goes to the blast centre, grows and spins
-    const k = Math.min(1, (t - p.spinGrow) / 1000), m = Math.min(1, k / .2), mm = m * m * (3 - 2 * m), e = 1 - Math.pow(1 - k, 2);
-    const [tr, tc] = p.spinAt || [p.r, p.c];
-    const cx = (p.px + (tc - p.px) * mm + .5) * S, cy = (p.py + (tr - p.py) * mm + .5) * S, s = S * .9 * (.74 + 1.5 * e);
+swap('  for (const p of liftedNow) {', r'''  for (const p of spinNow) {   // Striped bloom + Bouquet: the flower (not its box) grows and spins in the Bouquet's space
+    const k = Math.min(1, (t - p.spinGrow) / 1000), e = 1 - Math.pow(1 - k, 2);
+    const cx = (p.px + .5) * S, cy = (p.py + .5) * S, s = S * .9 * (.74 + 1.5 * e);
     ctx.fillStyle = rg(ctx, cx, cy, s * .8, [[0, `rgba(255,255,255,${.75 * e})`], [.5, `rgba(255,220,240,${.4 * e})`], [1, "rgba(255,255,255,0)"]]);
     circle(ctx, cx, cy, s * .8); ctx.fill();
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(e * TAU * 2.5); ctx.scale(s, s);
