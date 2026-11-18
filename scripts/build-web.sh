@@ -41,6 +41,7 @@ python3 scripts/patch-bgm-webaudio.py
 python3 scripts/patch-ugc-safety.py
 python3 scripts/patch-ad-levels.py
 python3 scripts/patch-level16-heart.py
+python3 scripts/patch-goals-swamp.py
 python3 scripts/patch-garden-bg.py
 python3 scripts/patch-neon-images.py
 python3 scripts/patch-ios.py
