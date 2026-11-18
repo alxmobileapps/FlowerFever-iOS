@@ -43,6 +43,7 @@ python3 scripts/patch-ad-levels.py
 python3 scripts/patch-level16-heart.py
 python3 scripts/patch-goals-swamp.py
 python3 scripts/patch-combo-shower-fx.py
+python3 scripts/patch-lift-overlay.py
 python3 scripts/patch-garden-bg.py
 python3 scripts/patch-neon-images.py
 python3 scripts/patch-ios.py

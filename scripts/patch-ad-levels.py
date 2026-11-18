@@ -10,6 +10,7 @@ p = pathlib.Path(__file__).resolve().parent.parent / "www" / "index.html"
 s = p.read_text(encoding="utf-8")
 BANNER_FROM = 10   # level index (0-based): 10 = level 11
 INTER_FROM = 50    # level index (0-based): 50 = level 51
+INTER_ON = False   # between-level (interstitial) ads switched off for now; set True to bring them back
 
 def swap(old, new):
     global s
@@ -18,6 +19,6 @@ def swap(old, new):
     s = s.replace(old, new)
 
 swap("!mapOpen && booted && levelIdx >= 20;", f"!mapOpen && booted && levelIdx >= {BANNER_FROM};")
-swap("booted && levelIdx >= 20 && targetLevel >= 20 &&", f"booted && levelIdx >= {INTER_FROM} && targetLevel >= {INTER_FROM} &&")
+swap("booted && levelIdx >= 20 && targetLevel >= 20 &&", f"{'' if INTER_ON else 'false && '}booted && levelIdx >= {INTER_FROM} && targetLevel >= {INTER_FROM} &&")
 p.write_text(s, encoding="utf-8")
-print(f"ads: banner from level {BANNER_FROM + 1}, between-level ads from level {INTER_FROM + 1}")
+print(f"ads: banner from level {BANNER_FROM + 1}, between-level ads " + (f"from level {INTER_FROM + 1}" if INTER_ON else "OFF"))
