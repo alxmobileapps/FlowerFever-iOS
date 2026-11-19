@@ -46,5 +46,6 @@ python3 scripts/patch-combo-shower-fx.py
 python3 scripts/patch-lift-overlay.py
 python3 scripts/patch-garden-bg.py
 python3 scripts/patch-neon-images.py
+python3 scripts/patch-flower-ask.py
 python3 scripts/patch-ios.py
 python3 scripts/ios/scrub_platform.py
