@@ -160,3 +160,36 @@ echo "Info.plist:"; $PB -c "Print" "$PLIST" | grep -E "GADApplicationIdentifier|
 sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 1[34]\.0;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/App/App.xcodeproj/project.pbxproj
 sed -i '' "s/platform :ios, '1[34]\.0'/platform :ios, '15.0'/" ios/App/Podfile
 grep -m1 "IPHONEOS_DEPLOYMENT_TARGET" ios/App/App.xcodeproj/project.pbxproj; grep -m1 "platform :ios" ios/App/Podfile
+
+# TestFlight builds show Google TEST ads (a new app gets almost no real ads before it is live, so rewards could not be
+# tested). The app tells the game it is a TestFlight install (sandbox receipt) through window.FF_TESTFLIGHT, set before
+# the game page loads. App Store installs: false -> real ads.
+cat > ios/App/App/MainViewController.swift <<'SWIFT'
+import UIKit
+import WebKit
+import Capacitor
+
+class MainViewController: CAPBridgeViewController {
+    override func capacitorDidLoad() {
+        let testFlight = Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        let js = "window.FF_TESTFLIGHT = \(testFlight ? "true" : "false");"
+        webView?.configuration.userContentController.addUserScript(
+            WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    }
+}
+SWIFT
+SB="ios/App/App/Base.lproj/Main.storyboard"
+sed -i '' 's/customClass="CAPBridgeViewController" customModule="Capacitor"/customClass="MainViewController" customModule="App" customModuleProvider="target"/' "$SB"
+grep -q 'customClass="MainViewController"' "$SB" || { echo "::error::Main.storyboard: could not switch to MainViewController"; exit 1; }
+ruby - <<'RUBY'
+require 'xcodeproj'
+proj = Xcodeproj::Project.open('ios/App/App.xcodeproj')
+target = proj.targets.find { |t| t.name == 'App' }
+group = proj.main_group.find_subpath('App', false)
+unless group.files.any? { |f| f.path == 'MainViewController.swift' }
+  ref = group.new_reference('MainViewController.swift')
+  target.add_file_references([ref])
+  puts "added MainViewController.swift (TestFlight -> test ads)"
+end
+proj.save
+RUBY

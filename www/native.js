@@ -16,7 +16,7 @@
   /* ---------- Ads (AdMob) ---------- */
   const AdMob = P('AdMob');
   if (AdMob) {
-    const test = !!cfg.testing;
+    const test = !!cfg.testing || window.FF_TESTFLIGHT === true;   // TestFlight installs: Google test ads (set by MainViewController.swift)
     let ready = (async () => {
       try {
         await window.FlowerFeverATT;   // the tracking question is answered before the ad SDK starts

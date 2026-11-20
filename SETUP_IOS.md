@@ -69,6 +69,7 @@ Done: the iOS app is registered and the file is in the repo; Apple sign-in is on
 ## 5. AdMob
 AdMob → Apps → **Add app → iOS** (Flower Fever), then make 3 ad units: Banner, Interstitial, Rewarded.
 Put the app id and the 3 unit ids in `www/ads-config.js` → `FLOWER_ADS_IOS`, and set `testing: false`.
+TestFlight installs always get Google **test** ads (the app checks for a TestFlight receipt); App Store installs get real ads.
 
 ## 6. Before sending for review
 Apple asks for: iPhone screenshots (6.9" and 6.5"), privacy policy URL, the App Privacy questionnaire
