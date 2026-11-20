@@ -50,6 +50,7 @@ python3 scripts/patch-neon-images.py
 python3 scripts/patch-flower-ask.py
 python3 scripts/patch-slow-fall.py
 python3 scripts/patch-voices4.py
+python3 scripts/patch-unbelievable.py
 python3 scripts/patch-tablet-board.py
 python3 scripts/patch-ios.py
 python3 scripts/ios/scrub_platform.py
