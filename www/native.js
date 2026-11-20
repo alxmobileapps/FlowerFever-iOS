@@ -53,6 +53,9 @@
       })().finally(() => { bannerRun = null; if (bannerWanted !== bannerOnScreen && !bannerWanted) bannerApply(); });
       return bannerRun;
     };
+    // A banner that finishes loading after the player has already left the level (e.g. back on Home) must not pop up there.
+    ['bannerAdLoaded', 'bannerAdSizeChanged'].forEach(ev => { try { Promise.resolve(AdMob.addListener(ev, () => {
+      if (!bannerWanted) { AdMob.hideBanner().catch(() => {}); bannerOnScreen = false; } })).catch(() => {}); } catch (e) {} });
     const banner = {
       show() { bannerWanted = true; return bannerApply(); },
       hide() { bannerWanted = false; return bannerApply(); }
