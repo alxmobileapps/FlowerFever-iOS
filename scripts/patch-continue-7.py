@@ -1,5 +1,5 @@
 """Continue gives +7 moves; the "Hurry!" warning comes at 4 moves left after a continue (was 2);
-right after the warning, the lifeline button glows for 5 seconds.
+right after the warning, a light runs around the lifeline button until all goals are done (or the level ends).
 Runs after the .patch files (it edits the final www/index.html).
 """
 from pathlib import Path
@@ -24,18 +24,25 @@ rep("Continuing with +5 moves costs", "Continuing with +7 moves costs")
 rep("moves += 5; hurried = false;", "moves += 7; hurried = false;", 3)
 rep("""moves <= (continued ? 2 : 5) && !goalsDone()) { hurried = true; praise("Hurry!"); sfx("hurry"); setTimeout(movesLeftFly, 650); }""",
     """moves <= (continued ? 4 : 5) && !goalsDone()) { hurried = true; praise("Hurry!"); sfx("hurry"); setTimeout(movesLeftFly, 650); flashLifeline(); }""")
-rep("function hideLifelineTip() {", """// CONTINUE7_PATCH: the lifeline button glows for 5 seconds after the "Hurry!" warning
-let lifeFlashT = 0;
+rep("function hideLifelineTip() {", """// CONTINUE7_PATCH: after the "Hurry!" warning a light runs around the lifeline button until the goals are done
+let lifeFlashT = 0, lifeFlashLv = -1, lifeLvTok = 0;
+function stopLifeFlash() { clearInterval(lifeFlashT); lifeFlashT = 0; const b = document.getElementById("bLife"); if (b) b.classList.remove("llflash"); }
 function flashLifeline() {
   const b = document.getElementById("bLife"); if (!b) return;
-  clearTimeout(lifeFlashT); b.classList.remove("llflash"); void b.offsetWidth;
-  setTimeout(() => b.classList.add("llflash"), 900);
-  lifeFlashT = setTimeout(() => b.classList.remove("llflash"), 5900);
+  stopLifeFlash(); lifeFlashLv = lifeLvTok;
+  setTimeout(() => { if (lifeFlashLv === lifeLvTok && !goalsDone()) b.classList.add("llflash"); }, 900);
+  lifeFlashT = setInterval(() => { if (goalsDone() || lifeFlashLv !== lifeLvTok || !b.isConnected) stopLifeFlash(); }, 500);   // cheap check, twice a second
 }
 function hideLifelineTip() {""")
-rep(".llbig{display:flex;", """#bLife.llflash{animation:llflash .9s ease-in-out infinite;position:relative;z-index:3}
-@keyframes llflash{0%,100%{box-shadow:0 0 0 3px #ffd23a,0 0 12px 4px rgba(255,210,58,.7);transform:scale(1)}50%{box-shadow:0 0 0 6px #ffd23a,0 0 26px 10px rgba(255,170,30,.9);transform:scale(1.14)}}
-@media (prefers-reduced-motion:reduce){#bLife.llflash{animation:none;box-shadow:0 0 0 5px #ffd23a}}
+rep("function startLevel(i, asChallenge = false) {", "function startLevel(i, asChallenge = false) {\n  stopLifeFlash(); lifeLvTok++;")
+rep(".llbig{display:flex;", """/* running light: one small ring layer; only its gradient angle moves (no layout, no big repaints) */
+@property --llrun{syntax:"<angle>";inherits:false;initial-value:0deg}
+#bLife.llflash::before{content:"";position:absolute;inset:-8px;border-radius:20px;padding:5px;pointer-events:none;z-index:1;
+  background:conic-gradient(from var(--llrun),transparent 0 22%,#ff4f9a 34%,#fff 49%,transparent 50% 72%,#ff4f9a 84%,#fff 99%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:llrun 1.1s linear infinite}
+@keyframes llrun{to{--llrun:360deg}}
+@media (prefers-reduced-motion:reduce){#bLife.llflash::before{animation:none;background:#ffd23a}}
 .llbig{display:flex;""")
 path.write_text(src)
 print("continue +7 patch applied")
