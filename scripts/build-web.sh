@@ -45,6 +45,7 @@ python3 scripts/patch-showcase-levels.py
 python3 scripts/patch-goals-swamp.py
 python3 scripts/patch-combo-shower-fx.py
 python3 scripts/patch-lift-overlay.py
+python3 scripts/patch-layer-order.py
 python3 scripts/patch-garden-bg.py
 python3 scripts/patch-neon-images.py
 python3 scripts/patch-flower-ask.py
