@@ -1,1 +1,1 @@
-match 3,flower,garden,puzzle,bloom,blossom,relaxing,bouquet,casual,offline,swap,family,lola,brain
+match 3,flower,garden,puzzle,bloom,relaxing,bouquet,casual,offline,swap,family,blossom,brain,seniors
