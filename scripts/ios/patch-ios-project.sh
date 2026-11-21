@@ -62,7 +62,9 @@ cat > ios/App/App/PrivacyInfo.xcprivacy <<'XML'
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>NSPrivacyTracking</key><true/>
+  <!-- ITMS-91064: Apple wants tracking=true only together with a list of tracking domains. The game's own code
+       contacts no tracking domains (the AdMob SDK has its own manifest), so: false + empty list. -->
+  <key>NSPrivacyTracking</key><false/>
   <key>NSPrivacyTrackingDomains</key><array/>
   <key>NSPrivacyCollectedDataTypes</key>
   <array>
