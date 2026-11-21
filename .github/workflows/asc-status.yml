@@ -1,0 +1,26 @@
+name: App Store status (read only)
+# Linux runner. Shows the App Store versions, builds, review submissions and in-app purchase states.
+on:
+  workflow_dispatch: {}
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      REPORT: ${{ github.workspace }}/out/report.txt
+    steps:
+      - uses: actions/checkout@v4
+      - name: Status
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          mkdir -p out
+          if [ -n "$ASC_KEY_P8" ]; then RAW="$ASC_KEY_P8"; else RAW="$(echo "$ASC_KEY_P8_BASE64" | base64 --decode)"; fi
+          BODY="$(printf '%s' "$RAW" | sed -e 's/-----BEGIN PRIVATE KEY-----//' -e 's/-----END PRIVATE KEY-----//' | tr -d ' \t\r\n')"
+          { echo "-----BEGIN PRIVATE KEY-----"; printf '%s\n' "$(printf '%s' "$BODY" | fold -w 64)"; echo "-----END PRIVATE KEY-----"; } > "$RUNNER_TEMP/AuthKey.p8"
+          pip install --quiet pyjwt cryptography requests
+          ASC_KEY_PATH="$RUNNER_TEMP/AuthKey.p8" python3 appstore/asc.py status
+          cat out/report.txt

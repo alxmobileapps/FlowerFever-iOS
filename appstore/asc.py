@@ -448,10 +448,22 @@ def submit():
     log("OK", f"SUBMITTED for App Review: state={s['attributes'].get('state')}")
 
 
+def status():
+    """Read only: versions, their builds and the review submissions."""
+    app = find_app(); app_id = app["id"]
+    for v in get_all(f"/v1/apps/{app_id}/appStoreVersions", {"filter[platform]": "IOS"}):
+        b = call("GET", f"/v1/appStoreVersions/{v['id']}/build").get("data")
+        log("INFO", f"version {v['attributes']['versionString']}: {v['attributes']['appStoreState']}, build {b['attributes']['version'] if b else '-'}")
+    for sub in get_all("/v1/reviewSubmissions", {"filter[app]": app_id, "filter[platform]": "IOS"})[:5]:
+        log("INFO", f"submission {sub['attributes'].get('submittedDate')}: {sub['attributes'].get('state')}")
+    for i in get_all(f"/v1/apps/{app_id}/inAppPurchasesV2"):
+        log("INFO", f"IAP {i['attributes']['productId']}: {i['attributes'].get('state')}")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "prepare"
     try:
-        {"prepare": prepare, "attach-build": attach_build, "submit": submit}[cmd]()
+        {"prepare": prepare, "attach-build": attach_build, "submit": submit, "status": status}[cmd]()
     except Exception as e:
         log("FAIL", f"{cmd}: {e}")
     write_report()
