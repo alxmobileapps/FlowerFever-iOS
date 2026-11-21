@@ -140,8 +140,16 @@ jobs:
             archive | tail -n 40
           # the archive is unsigned, so it has no entitlements yet: ad-hoc sign it with them;
           # the App Store export re-signs it and keeps what the App ID allows (Sign in with Apple)
+          APP="$RUNNER_TEMP/FlowerFever.xcarchive/Products/Applications/App.app"
+          # Apple ITMS-91064: the app's own privacy manifest must be ours (an SDK's manifest copied over it had
+          # tracking domains with NSPrivacyTracking false). Show every manifest, then put ours back at the app root.
+          echo "== privacy manifests in the app"
+          find "$APP" -name "*.xcprivacy" | while read -r f; do
+            echo "$f  tracking=$(plutil -extract NSPrivacyTracking raw "$f" 2>/dev/null)  domains=$(plutil -extract NSPrivacyTrackingDomains json -o - "$f" 2>/dev/null)"
+          done
+          cp ios/App/App/PrivacyInfo.xcprivacy "$APP/PrivacyInfo.xcprivacy"
+          plutil -lint "$APP/PrivacyInfo.xcprivacy"
           if [ -f ios/App/App/App.entitlements ]; then
-            APP="$RUNNER_TEMP/FlowerFever.xcarchive/Products/Applications/App.app"
             codesign --force --deep --sign - --timestamp=none "$APP"
             codesign --force --sign - --timestamp=none --entitlements ios/App/App/App.entitlements "$APP"
           fi
