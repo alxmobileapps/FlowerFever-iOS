@@ -126,7 +126,7 @@ def find_app():
 def editable_version(app_id):
     versions = get_all(f"/v1/apps/{app_id}/appStoreVersions", {"filter[platform]": "IOS"})
     editable = [v for v in versions if v["attributes"]["appStoreState"] in
-                ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED")]
+                ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED", "INVALID_BINARY")]
     if not editable:
         raise ApiError("no editable iOS version found")
     return editable[0]
@@ -172,7 +172,7 @@ BOOL_FIELDS_FALSE = {
 def set_age_rating(app_id):
     infos = get_all(f"/v1/apps/{app_id}/appInfos")
     info = next((i for i in infos if i["attributes"].get("appStoreState") in
-                 ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", None)
+                 ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "INVALID_BINARY", None)
                  or i["attributes"].get("state") in ("PREPARE_FOR_SUBMISSION", "READY_FOR_DISTRIBUTION_EDITABLE")), infos[0])
     decl = call("GET", f"/v1/appInfos/{info['id']}/ageRatingDeclaration")["data"]
     current = decl["attributes"]
