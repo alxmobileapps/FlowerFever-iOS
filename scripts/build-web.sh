@@ -56,5 +56,6 @@ python3 scripts/patch-tablet-board.py
 python3 scripts/patch-friends-scroll.py
 python3 scripts/patch-audio-resume.py
 python3 scripts/patch-diag-regions.py
+python3 scripts/patch-plant-all.py
 python3 scripts/patch-ios.py
 python3 scripts/ios/scrub_platform.py
