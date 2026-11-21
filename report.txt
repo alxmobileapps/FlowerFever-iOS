@@ -1,0 +1,22 @@
+RESULT: ALL OK
+
+OK    Found app Flower Fever: Match 3 (6835387214)
+OK    Version string: already 1.0.0
+OK    Content rights (no third-party content)
+OK    Age rating questionnaire: set 24 answers; still unanswered (do in web): datingAndRelationships, sharedLocation, gracRatingClassificationNumber
+OK    Price: Free: already Free
+OK    Availability: all countries except mainland China: already set (left unchanged)
+OK    In-app purchase com.alxmobileapps.flowerfever.starter30: exists, review note, screenshot already there
+OK    In-app purchase com.alxmobileapps.flowerfever.gems10: exists, review note, screenshot already there
+OK    In-app purchase com.alxmobileapps.flowerfever.gems25: exists, review note, screenshot already there
+OK    In-app purchase com.alxmobileapps.flowerfever.gems60: exists, review note, screenshot already there
+OK    In-app purchase com.alxmobileapps.flowerfever.gems170: exists, review note, screenshot already there
+OK    In-app purchase com.alxmobileapps.flowerfever.gems400: exists, review note, screenshot already there
+OK    In-app purchase com.alxmobileapps.flowerfever.noads100: exists, review note, screenshot already there
+
+== fastlane deliver
+OK    fastlane deliver
+RESULT: ALL OK
+
+OK    Attach build: build 33 attached to version 1.0.0
+
