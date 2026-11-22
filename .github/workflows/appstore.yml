@@ -13,6 +13,10 @@ on:
         description: 'Submit for App Review after filling in the listing'
         type: boolean
         default: false
+      cancel_first:
+        description: 'First take the version out of App Review (to swap in a newer build)'
+        type: boolean
+        default: false
       min_build:
         description: 'Only attach a build at least this new'
         default: '11'
@@ -53,6 +57,10 @@ jobs:
                             "key": open(sys.argv[1]).read(), "in_house": False}))
           PY
           pip install --quiet pyjwt cryptography requests
+
+      - name: Take the version out of App Review
+        if: inputs.cancel_first == true
+        run: python3 appstore/asc.py cancel
 
       - name: Prepare app (version, age rating, price, availability, in-app purchases)
         run: python3 appstore/asc.py prepare

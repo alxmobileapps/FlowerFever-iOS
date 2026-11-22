@@ -455,6 +455,26 @@ def submit():
     log("OK", f"SUBMITTED for App Review: state={s['attributes'].get('state')}")
 
 
+def cancel_review():
+    """Take the version that is waiting for (or in) review back out, so a newer build can be attached."""
+    app = find_app(); app_id = app["id"]
+    subs = get_all("/v1/reviewSubmissions", {"filter[app]": app_id, "filter[platform]": "IOS"})
+    live = [x for x in subs if x["attributes"].get("state") in ("WAITING_FOR_REVIEW", "IN_REVIEW", "READY_FOR_REVIEW")]
+    if not live:
+        log("INFO", "cancel: nothing waiting for review"); return
+    for sub in live:
+        call("PATCH", f"/v1/reviewSubmissions/{sub['id']}", {"data": {"type": "reviewSubmissions", "id": sub["id"], "attributes": {"canceled": True}}})
+        log("OK", f"cancel: review submission {sub['id']} canceled")
+    for _ in range(40):   # wait until the version can be edited again
+        time.sleep(15)
+        try:
+            v = editable_version(app_id)
+            log("OK", f"cancel: version {v['attributes']['versionString']} is editable again ({v['attributes']['appStoreState']})"); return
+        except ApiError:
+            pass
+    log("FAIL", "cancel: the version did not become editable within 10 minutes")
+
+
 def status():
     """Read only: versions, their builds and the review submissions."""
     app = find_app(); app_id = app["id"]
@@ -470,7 +490,7 @@ def status():
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "prepare"
     try:
-        {"prepare": prepare, "attach-build": attach_build, "submit": submit, "status": status}[cmd]()
+        {"prepare": prepare, "attach-build": attach_build, "submit": submit, "status": status, "cancel": cancel_review}[cmd]()
     except Exception as e:
         log("FAIL", f"{cmd}: {e}")
     write_report()
