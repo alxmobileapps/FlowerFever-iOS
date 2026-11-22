@@ -128,7 +128,14 @@ def editable_version(app_id):
     editable = [v for v in versions if v["attributes"]["appStoreState"] in
                 ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED", "INVALID_BINARY")]
     if not editable:
-        raise ApiError("no editable iOS version found")
+        # the live version is done: start the next one (an update) with VERSION
+        if any(v["attributes"]["versionString"] == VERSION for v in versions):
+            raise ApiError(f"version {VERSION} exists and is not editable - raise IOS_APP_VERSION")
+        new = call("POST", "/v1/appStoreVersions", {"data": {"type": "appStoreVersions",
+                   "attributes": {"platform": "IOS", "versionString": VERSION, "releaseType": "AFTER_APPROVAL"},
+                   "relationships": {"app": {"data": {"type": "apps", "id": app_id}}}}})["data"]
+        log("OK", f"new App Store version {VERSION} created")
+        return new
     return editable[0]
 
 

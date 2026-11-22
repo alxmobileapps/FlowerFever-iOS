@@ -1,0 +1,10 @@
+What's new in Flower Fever:
+
+• "Plant all I need" on bouquets: plant every missing flower in one tap
+• Cheers like "Unbelievable!" now always show on top
+• Glowing power-ups at the edge of the board are no longer cut off
+• Flowers on side-by-side boards drop into the right board
+• Sound comes back right away when you return to the game
+• Long friends lists scroll, so the Back button is always on screen
+• The screen no longer moves when you drag it
+• Bug fixes and improvements
