@@ -60,7 +60,7 @@
       if (ev === 'bannerAdSizeChanged' && !(info && info.height > 0)) return;
       AdMob.hideBanner().catch(() => {}); bannerOnScreen = false; })).catch(() => {}); } catch (e) {} });
     // safety net: while the game does not want a banner (Home, garden, map, windows), make sure none is showing
-    setInterval(() => { if (!bannerWanted && bannerShown && !bannerRun && !document.hidden) AdMob.hideBanner().catch(() => {}); }, 2500);
+    setInterval(() => { if (!bannerWanted && bannerShown && !bannerRun && !document.hidden) AdMob.hideBanner().catch(() => {}); }, 500);
     const banner = {
       show() { bannerWanted = true; return bannerApply(); },
       hide() { bannerWanted = false; return bannerApply(); }
