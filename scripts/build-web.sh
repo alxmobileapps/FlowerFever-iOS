@@ -59,5 +59,6 @@ python3 scripts/patch-diag-regions.py
 python3 scripts/patch-plant-all.py
 python3 scripts/patch-no-scroll.py
 python3 scripts/patch-switch-tip.py
+python3 scripts/patch-bee-swamp.py
 python3 scripts/patch-ios.py
 python3 scripts/ios/scrub_platform.py
