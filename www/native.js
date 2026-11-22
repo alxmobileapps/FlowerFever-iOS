@@ -54,8 +54,13 @@
       return bannerRun;
     };
     // A banner that finishes loading after the player has already left the level (e.g. back on Home) must not pop up there.
-    ['bannerAdLoaded', 'bannerAdSizeChanged'].forEach(ev => { try { Promise.resolve(AdMob.addListener(ev, () => {
-      if (!bannerWanted) { AdMob.hideBanner().catch(() => {}); bannerOnScreen = false; } })).catch(() => {}); } catch (e) {} });
+    // (a hide reports size 0, so only a banner that really has a size is hidden again - no hide/size loop)
+    ['bannerAdLoaded', 'bannerAdSizeChanged'].forEach(ev => { try { Promise.resolve(AdMob.addListener(ev, info => {
+      if (bannerWanted) return;
+      if (ev === 'bannerAdSizeChanged' && !(info && info.height > 0)) return;
+      AdMob.hideBanner().catch(() => {}); bannerOnScreen = false; })).catch(() => {}); } catch (e) {} });
+    // safety net: while the game does not want a banner (Home, garden, map, windows), make sure none is showing
+    setInterval(() => { if (!bannerWanted && bannerShown && !bannerRun && !document.hidden) AdMob.hideBanner().catch(() => {}); }, 2500);
     const banner = {
       show() { bannerWanted = true; return bannerApply(); },
       hide() { bannerWanted = false; return bannerApply(); }
