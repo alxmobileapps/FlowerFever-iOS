@@ -1,5 +1,6 @@
 What's new in Flower Fever:
 
+• Uses less battery and keeps your phone cooler
 • The garden picture on the Home screen now glides smoothly to your garden
 • The app opens straight to the Home screen
 • Bug fixes and improvements
