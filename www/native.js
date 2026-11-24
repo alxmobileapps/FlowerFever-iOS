@@ -192,7 +192,7 @@
     const seen = id => { try { return (JSON.parse(localStorage.getItem('ff.tx') || '[]')).includes(id); } catch (e) { return false; } };
     const markSeen = id => { try { const a = JSON.parse(localStorage.getItem('ff.tx') || '[]'); a.push(id); localStorage.setItem('ff.tx', JSON.stringify(a.slice(-200))); } catch (e) {} };
 
-    storeApi.buy = id => new Promise(async res => {
+    const order = id => new Promise(async res => {
       const p = store.get(sku(id), Platform.GOOGLE_PLAY), offer = p && p.getOffer();
       if (!offer || waiting[id]) { res(false); return; }
       waiting[id] = res;
@@ -200,6 +200,42 @@
       if (err) { delete waiting[id]; res(false); }   // cancelled or failed
       setTimeout(() => { if (waiting[id] === res) { delete waiting[id]; res(false); } }, 10 * 60 * 1000);
     });
+    // The store's payment window can take a few seconds to appear: show "Opening the App Store..." right away
+    // so the tap clearly worked. The window covers the game (and blocks taps) until the purchase is paid,
+    // cancelled or failed. After 20 s it offers a Close button; a purchase that still goes through is delivered.
+    storeApi.buy = async id => {
+      payWait(true);
+      try { return await order(id); } finally { payWait(false); }
+    };
+
+    let payTimer = 0;
+    function payWait(on) {
+      try {
+        clearTimeout(payTimer);
+        let d = document.getElementById('ffPayWait');
+        if (!on) { if (d) d.remove(); return; }
+        if (!d) {
+          d = document.createElement('div'); d.id = 'ffPayWait'; d.setAttribute('role', 'alert');
+          d.style.cssText = 'position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;background:rgba(60,20,40,.6);padding:16px;touch-action:none';
+          d.innerHTML = '<style>@keyframes ffPaySpin{to{transform:rotate(360deg)}}</style>'
+            + '<div style="background:#fff;border-radius:24px;padding:24px 28px;max-width:300px;width:100%;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.35);font-family:Nunito,sans-serif">'
+            + '<div style="width:46px;height:46px;margin:0 auto 14px;border-radius:50%;border:5px solid #fcd3e3;border-top-color:#e8467e;animation:ffPaySpin .8s linear infinite"></div>'
+            + '<div style="font-size:21px;font-weight:900;color:#5a2e44">Opening the App Store...</div>'
+            + '<div id="ffPayMsg" style="font-size:16px;font-weight:700;color:#8a6a7a;margin-top:4px">Please wait.</div>'
+            + '<button id="ffPayClose" style="display:none;margin:16px auto 0;border:0;border-radius:999px;padding:12px 30px;font:800 17px Nunito,sans-serif;color:#fff;background:linear-gradient(#ff7eb3,#e8457f);box-shadow:0 4px 0 #b52d63">Close</button></div>';
+          ['click', 'pointerdown', 'touchstart'].forEach(ev => d.addEventListener(ev, e => {
+            if (e.target && e.target.id === 'ffPayClose') { if (ev === 'click') payWait(false); return; }
+            e.stopPropagation(); e.preventDefault();
+          }, { passive: false }));
+          document.body.appendChild(d);
+        }
+        payTimer = setTimeout(() => {
+          const m = document.getElementById('ffPayMsg'), b = document.getElementById('ffPayClose');
+          if (m) m.textContent = 'This is taking longer than usual. You can close this and try again.';
+          if (b) b.style.display = 'block';
+        }, 20000);
+      } catch (e) {}
+    }
     storeApi.restore = async () => {
       try { await store.restorePurchases(); } catch (e) {}
       return store.products.filter(p => p.owned).map(p => gameId(p.id));
