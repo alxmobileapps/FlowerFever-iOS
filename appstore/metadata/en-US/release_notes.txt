@@ -1,4 +1,3 @@
 What's new in Flower Fever:
 
-• Buying diamonds: a "please wait" window now shows right away while the App Store opens
 • Bug fixes and improvements

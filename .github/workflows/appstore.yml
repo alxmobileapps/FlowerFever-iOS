@@ -3,6 +3,7 @@ name: App Store listing + submit
 # Linux runner (cheap). Fills in the App Store listing from appstore/ and, when asked, submits for review.
 #   1. appstore/asc.py prepare      version, content rights, age rating, price Free, availability, in-app purchases
 #   2. fastlane deliver             text (appstore/metadata) + screenshots (appstore/screenshots) + App Review info
+#   2b. appstore/asc.py previews    preview videos (appstore/previews/<locale>/<PREVIEW_TYPE>.mp4)
 #   3. appstore/asc.py attach-build newest processed build >= MIN_BUILD -> version
 #   4. appstore/asc.py submit       only when "submit" is chosen (Run workflow) or the commit message has [submit]
 # Report: the listing-results branch.
@@ -31,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
-      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.3' }}
+      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.4' }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       MIN_BUILD: ${{ inputs.min_build || '11' }}
@@ -90,6 +91,10 @@ jobs:
           code=${PIPESTATUS[0]}
           if [ "$code" = 0 ]; then echo "OK    fastlane deliver" >> "$REPORT"; else
             echo "FAIL  fastlane deliver (exit $code)" >> "$REPORT"; grep -iE "error|❌|\[!\]" listing-out/deliver.log | tail -n 25 >> "$REPORT"; exit 1; fi
+
+      - name: Upload app preview videos (appstore/previews)
+        timeout-minutes: 30
+        run: python3 appstore/asc.py previews
 
       - name: Attach newest processed build
         timeout-minutes: 35

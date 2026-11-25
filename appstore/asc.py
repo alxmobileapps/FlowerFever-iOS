@@ -487,10 +487,95 @@ def status():
         log("INFO", f"IAP {i['attributes']['productId']}: {i['attributes'].get('state')}")
 
 
+# ---------------------------------------------------------------- app previews (videos)
+# appstore/previews/<locale>/<PREVIEW_TYPE>.mp4, e.g. en-US/IPHONE_67.mp4 (886x1920, 15-30 s, 30 fps).
+# fastlane deliver does not upload videos, so this does. A preview already there with the same
+# checksum is kept; otherwise the set's old previews are replaced. Waits until Apple has processed them.
+PREVIEWS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "previews")
+
+
+def upload_preview(set_id, path):
+    blob = open(path, "rb").read()
+    md5 = hashlib.md5(blob).hexdigest()
+    old = get_all(f"/v1/appPreviewSets/{set_id}/appPreviews")
+    if any(o["attributes"].get("sourceFileChecksum") == md5 for o in old):
+        return None, "already there"
+    for o in old:
+        call("DELETE", f"/v1/appPreviews/{o['id']}")
+    res = call("POST", "/v1/appPreviews", {"data": {
+        "type": "appPreviews",
+        "attributes": {"fileName": os.path.basename(path), "fileSize": len(blob), "mimeType": "video/mp4"},
+        "relationships": {"appPreviewSet": {"data": {"type": "appPreviewSets", "id": set_id}}}}})["data"]
+    for op in res["attributes"]["uploadOperations"]:
+        chunk = blob[op["offset"]: op["offset"] + op["length"]]
+        headers = {h["name"]: h["value"] for h in op.get("requestHeaders", [])}
+        r = requests.request(op["method"], op["url"], data=chunk, headers=headers, timeout=300)
+        r.raise_for_status()
+    call("PATCH", f"/v1/appPreviews/{res['id']}", {"data": {
+        "type": "appPreviews", "id": res["id"], "attributes": {"uploaded": True, "sourceFileChecksum": md5}}})
+    return res["id"], f"uploaded ({len(old)} old removed)" if old else "uploaded"
+
+
+def previews():
+    if not os.path.isdir(PREVIEWS_DIR):
+        log("INFO", "App previews: no appstore/previews folder")
+        return True
+    app_id = find_app()["id"]
+    version = editable_version(app_id)
+    locs = {l["attributes"]["locale"]: l["id"]
+            for l in get_all(f"/v1/appStoreVersions/{version['id']}/appStoreVersionLocalizations")}
+    ok, pending = True, []
+    for locale in sorted(os.listdir(PREVIEWS_DIR)):
+        folder = os.path.join(PREVIEWS_DIR, locale)
+        if locale not in locs:
+            log("FAIL", f"App preview {locale}: version {VERSION} has no {locale} localization")
+            ok = False
+            continue
+        sets = {s["attributes"]["previewType"]: s["id"]
+                for s in get_all(f"/v1/appStoreVersionLocalizations/{locs[locale]}/appPreviewSets")}
+        for name in sorted(os.listdir(folder)):
+            ptype = os.path.splitext(name)[0]
+            try:
+                if ptype not in sets:
+                    sets[ptype] = call("POST", "/v1/appPreviewSets", {"data": {
+                        "type": "appPreviewSets", "attributes": {"previewType": ptype},
+                        "relationships": {"appStoreVersionLocalization": {
+                            "data": {"type": "appStoreVersionLocalizations", "id": locs[locale]}}}}})["data"]["id"]
+                pid, note = upload_preview(sets[ptype], os.path.join(folder, name))
+                log("OK", f"App preview {locale}/{ptype}: {note}")
+                if pid:
+                    pending.append((f"{locale}/{ptype}", pid))
+            except Exception as e:
+                log("FAIL", f"App preview {locale}/{ptype}: {e}")
+                ok = False
+    # Apple processes the video (usually a few minutes); submitting earlier can fail
+    for label, pid in pending:
+        state = "?"
+        for _ in range(40):
+            a = call("GET", f"/v1/appPreviews/{pid}")["data"]["attributes"]
+            st = (a.get("videoDeliveryState") or a.get("assetDeliveryState") or {})
+            state = st.get("state", "?")
+            if state in ("COMPLETE", "FAILED"):
+                break
+            time.sleep(30)
+        if state == "COMPLETE":
+            log("OK", f"App preview {label}: processed by Apple")
+        else:
+            log("FAIL", f"App preview {label}: processing state {state} {st.get('errors') or ''}")
+            ok = False
+    return ok
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "prepare"
+    ok = True
     try:
-        {"prepare": prepare, "attach-build": attach_build, "submit": submit, "status": status, "cancel": cancel_review}[cmd]()
+        res = {"prepare": prepare, "attach-build": attach_build, "submit": submit, "status": status,
+               "cancel": cancel_review, "previews": previews}[cmd]()
+        ok = res is not False
     except Exception as e:
         log("FAIL", f"{cmd}: {e}")
+        ok = cmd != "previews"
     write_report()
+    if cmd == "previews" and not ok:
+        sys.exit(1)   # do not submit without the video
