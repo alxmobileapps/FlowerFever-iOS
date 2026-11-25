@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """When ads start (Nov 2026):
   - the banner under the board shows from level 11 (after level 10 is beaten)
-  - between-level full-screen ads come from level 101 (after level 100), once every 10 rounds
+  - between-level full-screen ads come from level 200, once every 10 rounds
 Rewarded ads (watch an ad for a reward) are unchanged and stay available to everyone.
 Runs after patch-quiet-ads.py (which writes the lines changed here)."""
 import pathlib, sys
@@ -9,7 +9,7 @@ import pathlib, sys
 p = pathlib.Path(__file__).resolve().parent.parent / "www" / "index.html"
 s = p.read_text(encoding="utf-8")
 BANNER_FROM = 10   # level index (0-based): 10 = level 11
-INTER_FROM = 100   # level index (0-based): 100 = level 101
+INTER_FROM = 199   # level index (0-based): 199 = level 200 (Nov 25 2026)
 INTER_EVERY = 10   # rounds between two full-screen ads
 INTER_ON = True    # between-level (interstitial) ads on (Nov 22 2026)
 

@@ -333,13 +333,13 @@ canvas#board{display:block;touch-action:none;border-radius:14px}
 .card .ribbon{top:-6px;background:linear-gradient(180deg,#ff8ab4,#e8467e);-webkit-text-stroke:3px #a3134c;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 #a3134c,0 8px 14px rgba(160,20,70,.3);padding:11px 30px 9px}
 .card .ribbon::before,.card .ribbon::after{content:"✿";position:absolute;top:50%;translate:0 -52%;font-size:20px;color:#fff3a0;-webkit-text-stroke:0}
 .card .ribbon::before{left:9px}.card .ribbon::after{right:9px}
-.wstars{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:4px;margin:4px 0 0;height:58px}
-.wstars .rays{position:absolute;left:50%;top:50%;width:160px;height:160px;margin:-80px;border-radius:50%;z-index:0;
+.wstars{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:4px;margin:4px 0 0;height:76px}
+.wstars .rays{position:absolute;left:50%;top:50%;width:210px;height:210px;margin:-105px;border-radius:50%;z-index:0;
   background:repeating-conic-gradient(from 0deg,rgba(255,206,60,.32) 0 9deg,rgba(255,206,60,0) 9deg 22deg);
   -webkit-mask:radial-gradient(circle,#000 25%,transparent 70%);mask:radial-gradient(circle,#000 25%,transparent 70%);animation:spin2 14s linear infinite}
 @keyframes spin2{to{rotate:360deg}}
-.wstars span{position:relative;z-index:1;font:800 40px/1 var(--display);color:#f3dde6;transform:scale(.4);transition:transform .45s cubic-bezier(.2,1.7,.4,1),color .2s;-webkit-text-stroke:2px #e8c6d4}
-.wstars span:nth-child(3){font-size:52px;margin-bottom:4px}
+.wstars span{position:relative;z-index:1;font:800 54px/1 var(--display);color:#f3dde6;transform:scale(.4);transition:transform .45s cubic-bezier(.2,1.7,.4,1),color .2s;-webkit-text-stroke:2px #e8c6d4}
+.wstars span:nth-child(3){font-size:70px;margin-bottom:6px}
 .wstars span.on{color:#ffd23a;transform:scale(1);-webkit-text-stroke:2.5px #d48a00;text-shadow:0 0 18px rgba(255,200,40,.75)}
 .cheer{font:400 34px/1.2 "Pacifico",cursive;color:#e8467e;margin:2px 0 0;text-shadow:0 2px 0 #fff,0 3px 8px rgba(232,70,126,.25)}
 .wscore{display:flex;flex-direction:column;align-items:center;margin:2px 0 10px;position:relative}
@@ -3583,6 +3583,7 @@ function showWin() {
   confetti();
   const last = levelIdx === LEVELS.length - 1, nx = wasCh ? null : LEVELS[levelIdx + 1];
   const cheer = ["You did it!", "Lovely work!", "Perfect bloom!"][st - 1];
+  const recap = goals.filter(g => g.icon).map(g => `<span class="wg"><img alt="" src="${g.icon}"><i>✓</i></span>`).join("");
 
   let bonusDone = false, again = false;
   const render = () => show(`<div class="win">
@@ -3590,6 +3591,7 @@ function showWin() {
     <div class="wstars"><i class="rays"></i><span>★</span><span>★</span><span>★</span></div>
     <div class="cheer">${cheer}</div>
     <div class="wscore"><small>Score</small><b id="wsc">0</b>${newBest ? `<em>New best!</em>` : ""}</div>
+    ${recap ? `<div class="wrecap">${recap}</div>` : ""}
     ${gemGain ? `<div class="wgems">${GEM_SVG}<b>+${gemGain}</b> diamond${gemGain > 1 ? "s" : ""}</div>` : ""}
     ${fcGain ? `<div class="wgems wfc">${FC_SVG}<b>+${fcDoubled ? fcGain * 2 : fcGain}</b>${fcDoubled ? " (x2!)" : ""}${wGain ? " · 💧+1" : ""}</div>` : ""}
     ${rewardMsg}

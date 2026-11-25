@@ -67,5 +67,6 @@ python3 scripts/patch-continue-gems.py
 python3 scripts/patch-pano-resume.py
 python3 scripts/patch-boot-cover.py
 python3 scripts/patch-idle-draw.py
+python3 scripts/patch-win-revamp.py
 python3 scripts/patch-ios.py
 python3 scripts/ios/scrub_platform.py
