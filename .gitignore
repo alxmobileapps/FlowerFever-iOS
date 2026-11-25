@@ -5,3 +5,4 @@ www/vendor/
 *.keystore
 *.jks
 !android-keys/debug.keystore
+__pycache__/
