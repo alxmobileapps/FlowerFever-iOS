@@ -14,6 +14,7 @@ python3 scripts/patch-share-garden.py
 python3 scripts/patch-save-merge.py
 python3 scripts/patch-shower-combos.py
 python3 scripts/patch-bouquet-message.py
+python3 scripts/patch-ios-msg-keyboard.py
 python3 scripts/patch-fit-overlay.py
 python3 scripts/patch-garden-tutorial.py
 python3 scripts/patch-bee-help.py
