@@ -45,6 +45,11 @@ jobs:
           seed = Path("appstore/ipad-shots/seed.json").read_text()
           Path("www/shot-seed.js").write_text("window.FF_SHOT_SEED = " + seed + ";\nwindow.SHOT_EVERY = 24;\n")
           Path("www/shots.js").write_text(Path("appstore/ipad-shots/shots.js").read_text())
+          # no tracking question in the pictures
+          n = Path("www/native.js"); t = n.read_text()
+          a = "if (t && t.status === 'notDetermined') await Ad.requestTrackingAuthorization();"
+          assert t.count(a) == 1, "ATT anchor"
+          n.write_text(t.replace(a, ""))
           EOF
 
       - name: Create the iOS project
@@ -58,7 +63,7 @@ jobs:
           set -o pipefail
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build CODE_SIGNING_ALLOWED=NO TARGETED_DEVICE_FAMILY=1,2 build | tail -n 20
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO TARGETED_DEVICE_FAMILY=1,2 MARKETING_VERSION=9.9.9 build | tail -n 20
 
       - name: Run on the 13-inch iPad Pro and take screenshots
         run: |
@@ -77,12 +82,8 @@ jobs:
           xcrun simctl install "$UDID" "$APP"
           mkdir -p shots
           xcrun simctl launch "$UDID" com.alxmobileapps.flowerfever
-          # the tour (shots.js) moves on every 24 s after the page loads (~6 s after launch)
-          sleep 26;  xcrun simctl io "$UDID" screenshot shots/1_home.png
-          sleep 24;  xcrun simctl io "$UDID" screenshot shots/2_level.png
-          sleep 24;  xcrun simctl io "$UDID" screenshot shots/3_level_soil.png
-          sleep 26;  xcrun simctl io "$UDID" screenshot shots/4_garden.png
-          sleep 22;  xcrun simctl io "$UDID" screenshot shots/5_map.png
+          # the tour (shots.js) moves to the next screen every 24 s; take a picture every 4 s and pick the best ones
+          for i in $(seq -w 1 45); do sleep 4; xcrun simctl io "$UDID" screenshot shots/s$i.png >/dev/null 2>&1; done
           ls -la shots; sips -g pixelWidth -g pixelHeight shots/*.png
 
       - name: Save the screenshots on the ipad-shots branch
