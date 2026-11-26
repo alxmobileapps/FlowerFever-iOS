@@ -36,7 +36,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 75
     env:
-      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.4' }}
+      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.5' }}
       IOS_BUILD_NUMBER: ${{ github.run_number }}
       WORKSPACE: ios/App/App.xcworkspace
     steps:

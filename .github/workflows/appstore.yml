@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
-      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.4' }}
+      IOS_APP_VERSION: ${{ vars.IOS_APP_VERSION || '1.0.5' }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       MIN_BUILD: ${{ inputs.min_build || '11' }}
