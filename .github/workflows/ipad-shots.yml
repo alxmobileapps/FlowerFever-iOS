@@ -1,0 +1,87 @@
+name: iPad screenshots (Simulator)
+
+# Builds the app for the iPad Simulator with a guided tour (appstore/ipad-shots/shots.js), runs it on the
+# 13-inch iPad Pro simulator and saves a screenshot of each screen (Home, two levels, garden, level map).
+# The raw screenshots come out as the "ipad-raw" download; nothing is uploaded to Apple.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  shots:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Capacitor + plugins
+        run: |
+          npm install
+          echo "window.FLOWER_FIREBASE = false;" > www/firebase-config.js
+
+      - name: Build the game page + screenshot tour
+        run: |
+          bash scripts/build-web.sh
+          python3 - <<'EOF'
+          from pathlib import Path
+          p = Path("www/index.html"); s = p.read_text()
+          a = "let lifeFlashT = 0"
+          assert s.count(a) == 1, "hook anchor"
+          s = s.replace(a, "window.__G = c => eval(c); " + a)
+          b = '<script src="ads-config.js"></script>'
+          assert s.count(b) == 1, "script anchor"
+          s = s.replace(b, '<script src="shot-seed.js"></script>\n<script src="shots.js"></script>\n' + b)
+          p.write_text(s)
+          seed = Path("appstore/ipad-shots/seed.json").read_text()
+          Path("www/shot-seed.js").write_text("window.FF_SHOT_SEED = " + seed + ";\nwindow.SHOT_EVERY = 24;\n")
+          Path("www/shots.js").write_text(Path("appstore/ipad-shots/shots.js").read_text())
+          EOF
+
+      - name: Create the iOS project
+        run: |
+          npx cap add ios --packagemanager CocoaPods
+          bash scripts/ios/patch-ios-project.sh || true
+          npx cap sync ios
+
+      - name: Build for the iPad Simulator
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO TARGETED_DEVICE_FAMILY=1,2 build | tail -n 20
+
+      - name: Run on the 13-inch iPad Pro and take screenshots
+        run: |
+          set -x
+          xcrun simctl list devices available | grep -i ipad
+          UDID=$(xcrun simctl list devices available | grep -i "iPad Pro 13" | head -n1 | grep -oE '[0-9A-F-]{36}')
+          if [ -z "$UDID" ]; then
+            RT=$(xcrun simctl list runtimes | grep -oE 'com.apple.CoreSimulator.SimRuntime.iOS-[0-9-]+' | tail -n1)
+            DT=$(xcrun simctl list devicetypes | grep -i "iPad Pro 13" | head -n1 | grep -oE 'com.apple.CoreSimulator.SimDeviceType[^)]*')
+            UDID=$(xcrun simctl create "iPad13" "$DT" "$RT")
+          fi
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --wifiBars 3 || true
+          APP=$(find build/Build/Products -name "App.app" -path "*iphonesimulator*" | head -n1)
+          xcrun simctl install "$UDID" "$APP"
+          mkdir -p shots
+          xcrun simctl launch "$UDID" com.alxmobileapps.flowerfever
+          # the tour (shots.js) moves on every 24 s after the page loads (~6 s after launch)
+          sleep 26;  xcrun simctl io "$UDID" screenshot shots/1_home.png
+          sleep 24;  xcrun simctl io "$UDID" screenshot shots/2_level.png
+          sleep 24;  xcrun simctl io "$UDID" screenshot shots/3_level_soil.png
+          sleep 26;  xcrun simctl io "$UDID" screenshot shots/4_garden.png
+          sleep 22;  xcrun simctl io "$UDID" screenshot shots/5_map.png
+          ls -la shots; sips -g pixelWidth -g pixelHeight shots/*.png
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipad-raw
+          path: shots/
