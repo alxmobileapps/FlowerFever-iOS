@@ -1,3 +1,5 @@
 What's new in Flower Fever:
 
+• Now on iPad, with the game filling the whole screen
+• Easier to type your bouquet message: the keyboard no longer covers it
 • Bug fixes and improvements
