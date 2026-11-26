@@ -67,7 +67,6 @@ jobs:
 
       - name: Run on the 13-inch iPad Pro and take screenshots
         run: |
-          set -x
           xcrun simctl list devices available | grep -i ipad
           UDID=$(xcrun simctl list devices available | grep -i "iPad Pro 13" | head -n1 | grep -oE '[0-9A-F-]{36}')
           if [ -z "$UDID" ]; then
@@ -83,10 +82,11 @@ jobs:
           mkdir -p shots
           xcrun simctl launch "$UDID" com.alxmobileapps.flowerfever
           # the tour (shots.js) moves to the next screen every 24 s; take a picture every 4 s and pick the best ones
-          for i in $(seq -w 1 45); do sleep 4; xcrun simctl io "$UDID" screenshot shots/s$i.png >/dev/null 2>&1; done
+          for i in $(seq -w 1 32); do sleep 5; perl -e 'alarm 25; exec @ARGV' xcrun simctl io "$UDID" screenshot shots/s$i.png >/dev/null 2>&1 || echo "shot $i skipped"; done
           ls -la shots; sips -g pixelWidth -g pixelHeight shots/*.png
 
       - name: Save the screenshots on the ipad-shots branch
+        if: always()
         run: |
           cp -r shots /tmp/shots
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
