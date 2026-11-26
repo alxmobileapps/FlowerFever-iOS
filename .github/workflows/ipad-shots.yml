@@ -49,7 +49,10 @@ jobs:
           n = Path("www/native.js"); t = n.read_text()
           a = "if (t && t.status === 'notDetermined') await Ad.requestTrackingAuthorization();"
           assert t.count(a) == 1, "ATT anchor"
-          n.write_text(t.replace(a, ""))
+          t = t.replace(a, "")
+          b = "const block = () => {"
+          assert t.count(b) == 1, "update anchor"
+          n.write_text(t.replace(b, b + " return;"))   # and no "please update" window
           EOF
 
       - name: Create the iOS project
