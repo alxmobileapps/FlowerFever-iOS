@@ -7,6 +7,9 @@ name: iPad screenshots (Simulator)
 on:
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   shots:
     runs-on: macos-15
@@ -81,6 +84,15 @@ jobs:
           sleep 26;  xcrun simctl io "$UDID" screenshot shots/4_garden.png
           sleep 22;  xcrun simctl io "$UDID" screenshot shots/5_map.png
           ls -la shots; sips -g pixelWidth -g pixelHeight shots/*.png
+
+      - name: Save the screenshots on the ipad-shots branch
+        run: |
+          cp -r shots /tmp/shots
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout --orphan ipad-shots
+          git rm -rf -q . ; rm -rf ./* ./.github 2>/dev/null || true
+          cp /tmp/shots/*.png .
+          git add *.png && git commit -qm "iPad simulator screenshots" && git push -f origin ipad-shots
 
       - uses: actions/upload-artifact@v4
         with:
