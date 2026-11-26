@@ -1,0 +1,88 @@
+[18:08:22]: [33mGet started using a Gemfile for fastlane https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile[0m
+[18:08:22]: fastlane 2.242.0 (Ruby 3.3.14, gem)
+[18:08:22]: Sending anonymous analytics information
+[18:08:22]: Learn more at https://docs.fastlane.tools/#metrics
+[18:08:22]: No personal or sensitive data is sent.
+[18:08:22]: You can disable this by adding `opt_out_usage` at the top of your Fastfile
+[18:08:22]: [32mSuccessfully loaded '/home/runner/work/FlowerFever-iOS/FlowerFever-iOS/fastlane/Deliverfile' 📄[0m
+[18:08:22]: [33mNo values defined in './fastlane/Deliverfile'[0m
+[18:08:22]: Creating authorization token for App Store Connect API
+
++-----------------------------------------------------------------------------+
+|                           [32mdeliver 2.242.0 Summary[0m                           |
++--------------------------------------+--------------------------------------+
+| api_key_path                         | /home/runner/work/_temp/api_key.json |
+| app_identifier                       | com.alxmobileapps.flowerfever        |
+| app_version                          | 1.0.5                                |
+| platform                             | ios                                  |
+| metadata_path                        | appstore/metadata                    |
+| screenshots_path                     | appstore/screenshots                 |
+| skip_binary_upload                   | true                                 |
+| overwrite_screenshots                | true                                 |
+| submit_for_review                    | false                                |
+| automatic_release                    | true                                 |
+| run_precheck_before_submit           | false                                |
+| force                                | true                                 |
+| edit_live                            | false                                |
+| use_live_version                     | false                                |
+| preview_frame_time_code              | 00:00:05:00                          |
+| overwrite_preview_videos             | false                                |
+| skip_screenshots                     | false                                |
+| skip_metadata                        | false                                |
+| skip_app_version_update              | false                                |
+| screenshot_processing_timeout        | 3600                                 |
+| sync_screenshots                     | false                                |
+| verify_only                          | false                                |
+| reject_if_possible                   | false                                |
+| version_check_wait_retry_limit       | 7                                    |
+| phased_release                       | false                                |
+| reset_ratings                        | false                                |
+| precheck_default_rule_level          | warn                                 |
+| ignore_language_directory_validation | false                                |
+| precheck_include_in_app_purchases    | true                                 |
++--------------------------------------+--------------------------------------+
+
+[18:08:22]: Making sure the latest version on App Store Connect matches '1.0.5'...
+[18:08:23]: [32m'1.0.5' is the latest version on App Store Connect[0m
+[18:08:23]: Loading 'appstore/metadata/en-US/description.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/keywords.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/release_notes.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/support_url.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/marketing_url.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/promotional_text.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/name.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/subtitle.txt'...
+[18:08:23]: Loading 'appstore/metadata/en-US/privacy_url.txt'...
+[18:08:23]: Loading 'appstore/metadata/copyright.txt'...
+[18:08:23]: Loading 'appstore/metadata/primary_category.txt'...
+[18:08:23]: Loading 'appstore/metadata/primary_first_sub_category.txt'...
+[18:08:23]: Loading 'appstore/metadata/primary_second_sub_category.txt'...
+[18:08:23]: Loading 'appstore/metadata/review_information/first_name.txt'...
+[18:08:23]: Loading 'appstore/metadata/review_information/last_name.txt'...
+[18:08:23]: Loading 'appstore/metadata/review_information/phone_number.txt'...
+[18:08:23]: Loading 'appstore/metadata/review_information/email_address.txt'...
+[18:08:23]: Loading 'appstore/metadata/review_information/notes.txt'...
+[18:08:25]: No changes to localized App Info detected. Skipping upload.
+[18:08:25]: [33mWill begin uploading metadata for '1.0.5' on App Store Connect[0m
+[18:08:25]: Uploading metadata to App Store Connect for version
+[18:08:30]: Uploading metadata to App Store Connect for localized version 'en-US'
+[18:08:32]: Uploading app review information to App Store Connect
+[18:08:34]: [33mWill begin uploading snapshots for '1.0.5' on App Store Connect[0m
+[18:08:34]: Starting with the upload of screenshots...
+[18:08:35]: Deleted 'en-US APP_IPHONE_67' -  (0.56332847 secs)
+[18:08:35]: [33mNumber of screenshots not deleted: 0[0m
+[18:08:35]: Successfully deleted all screenshots
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/6_home.png'... (2.153154325 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/5_friends.png'... (2.190352587 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/3_garden.png'... (2.197900642 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/1_board_match.png'... (2.204272217 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/ipad_4_home.png'... (2.269343781 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/4_levels.png'... (2.286445859 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/2_board_powerups.png'... (2.311134433 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/ipad_1_match.png'... (2.314038007 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/ipad_3_garden.png'... (2.439189559 secs)
+[18:08:39]: Uploaded 'appstore/screenshots/en-US/ipad_2_powerups.png'... (2.484125431 secs)
+[18:08:39]: Waiting for all the screenshots to finish being processed...
+[18:08:45]: Successfully uploaded all screenshots
+[18:08:45]: Sorting screenshots uploaded...
+[18:08:46]: [32mSuccessfully uploaded screenshots to App Store Connect[0m
