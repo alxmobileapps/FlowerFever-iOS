@@ -23,7 +23,8 @@ jobs:
       - name: Install Capacitor + plugins
         run: |
           npm install
-          echo "window.FLOWER_FIREBASE = false;" > www/firebase-config.js
+          npm install @capacitor-firebase/authentication@7.5.0 @capacitor-firebase/firestore@7.5.0 @capacitor-firebase/analytics@7.5.0 firebase@^11
+          echo "window.FLOWER_FIREBASE = true;" > www/firebase-config.js
 
       - name: Build the game page + screenshot tour
         run: |
@@ -46,7 +47,7 @@ jobs:
       - name: Create the iOS project
         run: |
           npx cap add ios --packagemanager CocoaPods
-          bash scripts/ios/patch-ios-project.sh || true
+          bash scripts/ios/patch-ios-project.sh
           npx cap sync ios
 
       - name: Build for the iPad Simulator
