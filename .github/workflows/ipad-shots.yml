@@ -87,7 +87,7 @@ jobs:
           # the tour (shots.js) moves to the next screen every 40 s after the page loads; one picture in the middle of each
           T0=$(date +%s)
           shot() { while [ $(( $(date +%s) - T0 )) -lt $1 ]; do sleep 1; done; perl -e 'alarm 120; exec @ARGV' xcrun simctl io "$UDID" screenshot "shots/$2.png" || echo "shot $2 failed"; }
-          shot 24 1_home; shot 40 1_home_b; shot 58 2_level; shot 98 3_level_soil; shot 140 4_garden; shot 178 5_map
+          shot 24 1_home; shot 40 1_home_b; shot 74 2_level; shot 114 3_level_soil; shot 158 4_garden; shot 196 5_map
           ls -la shots; sips -g pixelWidth -g pixelHeight shots/*.png
 
       - name: Save the screenshots on the ipad-shots branch
